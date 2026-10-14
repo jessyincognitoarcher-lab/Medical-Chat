@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TheYasmineMed — Tutor Toolkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --paper:#f7f4ee; --paper-2:#efe9dc; --ink:#161814; --ink-soft:#3d3f38;
+  --muted:#6a6c64; --faint:#8e9086; --line:#ddd6c8; --line-strong:#c9c1b1;
+  --surface:#fcfbf7; --sunken:#efeae0; --accent:#1a4d46; --accent-fg:#f7f4ee;
+  --accent-soft:#e4eeeb; --bronze:#8a5a32; --bronze-soft:#f3eadf;
+  --critical:#8e3b2e; --critical-soft:#f6ebe8; --warn:#8a5a28; --ok:#2b5d4c;
+  --shadow-card:0 0 0 1px rgba(22,24,20,.06),0 1px 2px -1px rgba(22,24,20,.06),0 2px 6px rgba(22,24,20,.04);
+  --shadow-hover:0 0 0 1px rgba(22,24,20,.1),0 4px 12px rgba(22,24,20,.06);
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Figtree',system-ui,sans-serif;line-height:1.55;min-height:100%}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;letter-spacing:-0.02em;margin:0}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:800px;margin:0 auto;padding:28px 20px 90px}
+header.top{position:sticky;top:0;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(247,244,238,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.topbar{max-width:800px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem}
+.brand b{font-style:normal;font-weight:600}
+nav.crumb{font-size:12px;color:var(--faint)}
+
+.kicker{font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+.view{display:none}
+.view.active{display:block;animation:fade .25s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-card);padding:20px}
+.card + .card{margin-top:14px}
+.grid2{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+
+/* Home */
+.hero h1{font-size:2rem;line-height:1.15;font-weight:500;max-width:19ch;margin-top:10px}
+.hero p.lede{margin-top:14px;max-width:60ch;color:var(--ink-soft);font-size:15px}
+.algo-grid{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-top:36px}
+@media(max-width:600px){.algo-grid{grid-template-columns:1fr}}
+.algo-card{display:block;cursor:pointer;transition:box-shadow .2s}
+.algo-card:hover{box-shadow:var(--shadow-hover)}
+.algo-card .num{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--faint)}
+.algo-card h2{font-size:1.3rem;font-weight:500;margin-top:6px}
+.algo-card p{margin-top:8px;font-size:13.5px;color:var(--muted)}
+.open-link{margin-top:14px;font-size:13px;color:var(--accent);display:inline-flex;gap:5px;align-items:center}
+
+.profiles{margin-top:48px}
+.profiles h2{font-size:1.5rem;font-weight:500}
+.profiles p{margin-top:8px;max-width:62ch;font-size:14px;color:var(--muted)}
+.profile-grid{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr;margin-top:20px}
+@media(max-width:700px){.profile-grid{grid-template-columns:1fr}}
+.profile-card .pname{font-family:'Fraunces',serif;font-size:1.3rem}
+.profile-card .pline{margin-top:8px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.profile-card .ptag{display:inline-block;margin-top:8px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px}
+.tag-sprint{background:var(--critical-soft);color:var(--critical)}
+.tag-standard{background:var(--accent-soft);color:var(--accent)}
+.tag-sustainable{background:var(--bronze-soft);color:var(--bronze)}
+.profile-card .btns{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+
+footer.note{margin-top:56px;text-align:center;font-size:11px;color:var(--faint);font-style:italic}
+
+/* Buttons */
+button.btn{font-family:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:9px 14px;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);transition:.15s}
+button.btn:hover{border-color:var(--accent);color:var(--accent)}
+button.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+button.btn.primary:hover{opacity:.92}
+button.btn.ghost{border-color:transparent;background:none}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+button.btn:disabled:hover{border-color:var(--line-strong);color:var(--ink)}
+
+/* Stepper */
+.stepper{display:flex;gap:5px;margin:22px 0 0}
+.dot{height:4px;flex:1;border-radius:2px;background:var(--line)}
+.dot.done{background:var(--accent)}
+.step-label{margin-top:8px;font-size:11.5px;color:var(--faint)}
+
+.field-label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+input.textin{height:44px;width:100%;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:15px;box-shadow:var(--shadow-card);outline:none;margin-bottom:22px}
+input.textin:focus{box-shadow:0 0 0 2px var(--accent)}
+textarea.textin{height:auto;padding:10px 12px;font-family:inherit}
+
+.opt-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+.opt-grid.wide{grid-template-columns:1fr}
+.opt-grid.narrow{grid-template-columns:repeat(3,1fr)}
+@media(max-width:560px){.opt-grid,.opt-grid.narrow{grid-template-columns:1fr 1fr}}
+.opt{border:1px solid var(--line);border-radius:10px;padding:12px 13px;cursor:pointer;background:var(--surface);transition:.15s}
+.opt:hover{border-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt .olabel{font-size:13.5px;font-weight:600}
+.opt .ohint{margin-top:4px;font-size:11.5px;color:var(--muted);line-height:1.4}
+
+.navrow{display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+
+/* Output docs */
+.doc-top h1{font-size:1.9rem;font-weight:500;margin-top:8px}
+.doc-top .sub{margin-top:6px;font-size:13.5px;color:var(--muted)}
+.doc-top .student{margin-top:4px;font-size:13.5px;font-weight:600}
+.doc-top .useline{margin-top:8px;font-size:11.5px;color:var(--faint);font-style:italic}
+
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:99px}
+.badge.mode-sprint{background:var(--critical-soft);color:var(--critical)}
+.badge.mode-intensive{background:#fbeee0;color:var(--warn)}
+.badge.mode-standard{background:var(--accent-soft);color:var(--accent)}
+.badge.mode-sustainable{background:var(--bronze-soft);color:var(--bronze)}
+.badge.neutral{background:var(--sunken);color:var(--ink-soft)}
+
+.blocklabel{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.blockbody{margin-top:5px;font-size:14px;line-height:1.65}
+
+.phase{margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.phase .pk{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
+.phase h2{font-size:1.5rem;margin-top:5px}
+.sec{margin-top:16px}
+.sec .slabel{font-size:12.5px;font-weight:700}
+.sec .slabel.rules{color:var(--bronze)}
+.sec .slabel.risk{color:var(--critical)}
+.sec ul{margin:8px 0 0;padding-left:20px;font-size:13.5px;line-height:1.6}
+.sec p.quote{margin-top:8px;border-left:2px solid rgba(26,77,70,.4);padding-left:12px;font-size:13.5px;font-style:italic;color:var(--ink-soft)}
+.sec p.prose{margin-top:8px;font-size:13.5px;line-height:1.6;color:var(--muted);white-space:pre-wrap}
+.code-chip{display:inline-block;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:10.5px;background:var(--sunken);color:var(--ink-soft);padding:2px 7px;border-radius:5px;margin:2px 4px 2px 0}
+
+.offer-card{margin-top:36px;background:var(--ink);color:var(--paper);border-radius:14px;padding:22px}
+.offer-card .ok{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.6}
+.offer-card .oname{font-family:'Fraunces',serif;font-style:italic;font-size:1.25rem;margin-top:8px}
+.offer-card p{margin-top:8px;font-size:13.5px;opacity:.9}
+
+.downloadbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{font-size:11px;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:4px 10px;font-weight:600}
+
+/* Worksheet */
+.ws-item{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--surface);margin-top:10px}
+.ws-item h3{font-size:15px;font-weight:600}
+.ws-item p{margin-top:6px;font-size:13.5px;color:var(--muted)}
+.blank-line{display:inline-block;border-bottom:1px solid var(--line-strong);min-width:120px;height:1.1em}
+
+/* Program table */
+.week-row{padding:14px 0;border-top:1px solid var(--line)}
+.week-row:first-of-type{border-top:none}
+.week-row-top{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:baseline}
+.week-num{font-family:'Fraunces',serif;color:var(--faint);font-size:1.05rem}
+.week-title{font-size:13.5px;font-weight:700}
+.week-track{margin-top:3px;font-size:11.5px;color:var(--faint)}
+.week-meta{font-size:10.5px;color:var(--faint);text-align:right}
+.week-detail{margin-top:8px;margin-left:68px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.week-detail .wd-label{font-weight:700;color:var(--ink-soft)}
+
+.assumptions{margin-top:8px;font-size:12px;color:var(--faint)}
+
+/* Diagnostic matrix (trial) */
+.diag-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:6px}
+.diag-row{border:1px solid var(--line);border-radius:10px;padding:12px 13px;background:var(--surface)}
+.diag-row .dtop{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.diag-row .dskill{font-size:13px;font-weight:700}
+.diag-row .dscore{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px}
+.dscore.crit{background:var(--critical-soft);color:var(--critical)}
+.dscore.high{background:#fbeee0;color:var(--warn)}
+.dscore.mod{background:var(--accent-soft);color:var(--accent)}
+.diag-row .dbody{margin-top:6px;font-size:12.5px;color:var(--muted);line-height:1.55}
+
+.lesson-code-out{margin-top:18px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <a class="brand" href="#" onclick="go('home');return false;"><b>TheYasmineMed</b> · tutor toolkit</a>
+    <nav class="crumb" id="crumb"></nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HOME -->
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <p class="kicker">Medical English · OET · OSCE</p>
+      <h1>Diagnose first. Teach the smallest thing that will hold.</h1>
+      <p class="lede">TheYasmineMed is the tutor-side machine: trial, programme, lesson script, worksheet. Timeline-aware, level-aware, profession-aware. Student documents stay calm. Tutor documents keep the codes and the reasoning.</p>
+    </div>
+
+    <div class="algo-grid">
+      <div class="card algo-card" onclick="go('trial-wizard')">
+        <div class="num">01</div>
+        <h2>Trial lesson</h2>
+        <p>Eight-part diagnostic across all four skills, weighted by what's actually weak. Produces a precise, actionable hypothesis — not a vibe.</p>
+        <div class="open-link">Open →</div>
+      </div>
+      <div class="card algo-card" onclick="loadProfile('razik','program')">
+        <div class="num">02</div>
+        <h2>Personalised programme</h2>
+        <p>Four compression modes from Extreme Sprint to Sustainable. Student PDF and tutor PDF, with internal codes and risk notes on the tutor copy.</p>
+        <div class="open-link">Open →</div>
+      </div>
+      <div class="card algo-card" onclick="loadProfile('aglailton','lesson')">
+        <div class="num">03</div>
+        <h2>Lesson script</h2>
+        <p>Paste a week's lesson code. Get timing, tutor lines, a patient case, a grammar micro-component and a pronunciation micro-component selected from the diagnostic, and an exit check.</p>
+        <div class="open-link">Open →</div>
+      </div>
+      <div class="card algo-card" onclick="loadProfile('aglailton','worksheet')">
+        <div class="num">04</div>
+        <h2>Student worksheet</h2>
+        <p>One calm page the student actually receives — scaffolded to their level and homework capacity, never the tutor's internal codes.</p>
+        <div class="open-link">Open →</div>
+      </div>
+    </div>
+
+    <div class="profiles">
+      <h2>Three live profiles</h2>
+      <p>Open a finished trial or programme. These are the compression tests: a stronger surgeon on a long OET path, a B1–B2 physician four weeks from the paper, a resident who wants conversation, not a mock exam.</p>
+      <div class="profile-grid">
+        <div class="card profile-card">
+          <div class="pname">Aglailton</div>
+          <p class="pline">Surgeon · upper B2 · OET Speaking + Reading · 4 months</p>
+          <span class="ptag tag-standard">Standard mode</span>
+          <div class="btns">
+            <button class="btn" onclick="loadProfile('aglailton','trial')">Trial</button>
+            <button class="btn" onclick="loadProfile('aglailton','program')">Programme</button>
+          </div>
+        </div>
+        <div class="card profile-card">
+          <div class="pname">Razik</div>
+          <p class="pline">GP / physician · B1–B2 · Reading first · exam in 4 weeks</p>
+          <span class="ptag tag-sprint">Extreme sprint</span>
+          <div class="btns">
+            <button class="btn" onclick="loadProfile('razik','trial')">Trial</button>
+            <button class="btn" onclick="loadProfile('razik','program')">Programme</button>
+          </div>
+        </div>
+        <div class="card profile-card">
+          <div class="pname">Zita</div>
+          <p class="pline">Resident · B1–B2 · grammar + conversation · once a week</p>
+          <span class="ptag tag-sustainable">Sustainable mode</span>
+          <div class="btns">
+            <button class="btn" onclick="loadProfile('zita','trial')">Trial</button>
+            <button class="btn" onclick="loadProfile('zita','program')">Programme</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="note">Internal tutor tool · diagnosis before prescription · by yasmine.b</footer>
+  </section>
+
+  <!-- TRIAL WIZARD -->
+  <section id="view-trial-wizard" class="view">
+    <button class="btn ghost" onclick="go('home')" style="padding-left:0">← Back</button>
+    <h1 style="font-size:1.9rem;font-weight:500;margin-top:12px">Trial algorithm</h1>
+    <p style="margin-top:8px;max-width:52ch;font-size:14px;color:var(--muted)">Name the diagnostic across all four skills. The script is written from the combination — not from a vibe.</p>
+
+    <div class="stepper" id="stepper"></div>
+    <p class="step-label" id="stepLabel"></p>
+
+    <div class="card" style="margin-top:14px">
+      <div id="stepBody"></div>
+      <div class="navrow">
+        <button class="btn" id="backBtn" onclick="wizStep(-1)">Back</button>
+        <button class="btn primary" id="nextBtn" onclick="wizNext()">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRIAL OUTPUT -->
+  <section id="view-trial-output" class="view">
+    <div class="card downloadbar">
+      <button class="btn" onclick="go('trial-wizard')">← Edit answers</button>
+      <button class="btn primary" onclick="downloadTrialPdf()">Download tutor PDF</button>
+    </div>
+
+    <div class="doc-top">
+      <p class="kicker">Private tutor script</p>
+      <h1 id="trialTitle"></h1>
+      <p class="sub" id="trialKicker"></p>
+      <p class="student" id="trialStudent"></p>
+      <div class="badge-row" id="trialBadges"></div>
+      <p class="useline">Private tutor script. Confirm the hypothesis against what you observe. Do not read this as a result.</p>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <div class="blocklabel">Profile</div>
+      <div class="blockbody" id="trialProfile"></div>
+      <div class="blocklabel" style="margin-top:16px">Diagnostic hypothesis</div>
+      <div class="blockbody" id="trialFocus"></div>
+      <div class="blocklabel" style="margin-top:16px">Programme direction</div>
+      <div class="blockbody" id="trialDirection"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="blocklabel">Skill-by-skill diagnostic matrix</div>
+      <div class="diag-grid" id="trialMatrix"></div>
+    </div>
+
+    <div id="trialPhases"></div>
+
+    <div class="offer-card">
+      <div class="ok">Offer</div>
+      <p class="oname" id="offerName"></p>
+      <p id="offerCadence"></p>
+      <p id="offerClose"></p>
+    </div>
+  </section>
+
+  <!-- PROGRAM -->
+  <section id="view-program" class="view">
+    <button class="btn ghost" onclick="go('home')" style="padding-left:0">← Back</button>
+    <p class="kicker" style="margin-top:14px">Personalised programme</p>
+    <h1 style="font-size:1.9rem;font-weight:500;margin-top:8px" id="progTitle">Programme</h1>
+    <p class="sub" id="progSub" style="margin-top:6px;font-size:13.5px;color:var(--muted)"></p>
+    <div class="badge-row" id="progBadges"></div>
+
+    <div class="card" style="margin-top:20px">
+      <div class="blocklabel">Compression mode &amp; rationale</div>
+      <div class="blockbody" id="progDirection"></div>
+      <div class="assumptions" id="progUrgency"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="blocklabel">Homework &amp; scaffolding rules applied</div>
+      <div class="blockbody" id="progRules"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="blocklabel" style="margin-bottom:6px">Week-by-week roadmap</div>
+      <div id="progWeeks"></div>
+    </div>
+
+    <div class="downloadbar" style="margin-top:20px">
+      <button class="btn primary" onclick="downloadProgramPdf('student')">Download student PDF</button>
+      <button class="btn" onclick="downloadProgramPdf('tutor')">Download tutor PDF</button>
+    </div>
+  </section>
+
+  <!-- LESSON SCRIPT -->
+  <section id="view-lesson" class="view">
+    <button class="btn ghost" onclick="go('home')" style="padding-left:0">← Back</button>
+    <p class="kicker" style="margin-top:14px">Lesson script</p>
+    <h1 style="font-size:1.9rem;font-weight:500;margin-top:8px">Session script</h1>
+    <p style="margin-top:8px;max-width:56ch;font-size:14px;color:var(--muted)">Generated from a week in the student's programme: timing, tutor lines, a full patient case, one grammar micro-component and one pronunciation micro-component chosen from the diagnostic, and an exit check.</p>
+
+    <div class="card" style="margin-top:18px">
+      <label class="field-label">Student</label>
+      <div class="opt-grid" style="margin-bottom:4px">
+        <div class="opt" id="lesson-pick-aglailton" onclick="loadProfile('aglailton','lesson')"><div class="olabel">Aglailton</div></div>
+        <div class="opt" id="lesson-pick-razik" onclick="loadProfile('razik','lesson')"><div class="olabel">Razik</div></div>
+        <div class="opt" id="lesson-pick-zita" onclick="loadProfile('zita','lesson')"><div class="olabel">Zita</div></div>
+      </div>
+      <label class="field-label" style="margin-top:16px">Week</label>
+      <div class="opt-grid narrow" id="lessonWeekPicker"></div>
+    </div>
+
+    <div id="lessonOutput"></div>
+
+    <div class="downloadbar" style="margin-top:20px" id="lessonDownloadBar"></div>
+  </section>
+
+  <!-- WORKSHEET -->
+  <section id="view-worksheet" class="view">
+    <button class="btn ghost" onclick="go('home')" style="padding-left:0">← Back</button>
+    <p class="kicker" style="margin-top:14px">Student worksheet</p>
+    <h1 style="font-size:1.9rem;font-weight:500;margin-top:8px">This week's worksheet</h1>
+
+    <div class="card" style="margin-top:18px">
+      <label class="field-label">Student</label>
+      <div class="opt-grid">
+        <div class="opt" id="ws-pick-aglailton" onclick="loadProfile('aglailton','worksheet')"><div class="olabel">Aglailton</div></div>
+        <div class="opt" id="ws-pick-razik" onclick="loadProfile('razik','worksheet')"><div class="olabel">Razik</div></div>
+        <div class="opt" id="ws-pick-zita" onclick="loadProfile('zita','worksheet')"><div class="olabel">Zita</div></div>
+      </div>
+    </div>
+
+    <div id="worksheetOutput"></div>
+
+    <div class="downloadbar" style="margin-top:20px">
+      <button class="btn primary" onclick="downloadWorksheetPdf()">Download worksheet PDF</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   THEYASMINEMED ENGINE v2 — elevated decision logic
+   ===================================================================== */
+
+// ---------- label dictionaries ----------
+const PROFESSION_LABEL = {"med-student":"Medical / health student",resident:"Resident / junior doctor",gp:"General practitioner",specialist:"Specialist doctor",surgeon:"Surgeon",nurse:"Nurse",midwife:"Midwife",paramedic:"Paramedic",vet:"Veterinarian",allied:"Allied health professional",other:"Healthcare professional"};
+const PROFESSION_HINT = {"med-student":"OSCE language, history taking, presenting a case. Often anxious about sounding junior.",resident:"Ward-level autonomy: decisions without a senior in the room, defending a plan on rounds, honest uncertainty at night.",gp:"OET Medicine default. Explanation, safety-netting, ICE under time pressure.",specialist:"Higher content knowledge, weaker lay explanations. Watch jargon and structure.",surgeon:"High clinical precision, often weaker empathy language and lay explanations.",nurse:"OET Nursing. Teaching, side-effects, family updates, handover language.",midwife:"Shared plans, consent, birth preferences, partner in the room.",paramedic:"Fast, high-stakes communication. Clarity under pressure and handover.",vet:"Explaining findings and plans to owners. Clear, calm, non-judgmental language.",allied:"Explaining procedures and findings in plain English.",other:"Adapt register to the workplace. Do not assume a classic OET role-play."};
+const LEVEL_LABEL = {a2:"Beginner / A2","b1-low":"Low B1","b1-b2":"Solid B1 – low B2","b2-upper":"Upper B2",c1:"C1 and above"};
+const LEVEL_HINT = {a2:"Survival phrases. Scaffolded patient, slow speech, one language target only.","b1-low":"Can greet and list symptoms. Needs sentence frames and pronunciation work.","b1-b2":"The common OET candidate. Can do the task, leaks accuracy and ICE.","b2-upper":"Fluent enough to hide gaps. Probe clinical communication, not just grammar.",c1:"Examiner-direct feedback. Use emotion, interruption, and bad-news tasks."};
+const GOAL_LABEL = {"oet-medicine":"OET Medicine","oet-nursing":"OET Nursing","oet-other":"OET — other profession",osce:"OSCE / clinical communication",conversational:"Conversational Medical English","medical-english":"Workplace Medical English",academic:"Research / academic medical English","job-interview":"Job interview / relocation",mixed:"Mixed goals"};
+const GOAL_HINT = {"oet-medicine":"Official speaking/writing criteria. Profession-specific scenarios.","oet-nursing":"Patient education, family, side-effects, handover.","oet-other":"Same criteria, adapted bank (pharmacy, physio, dentistry tone).",osce:"Calgary-Cambridge, SPIKES, ICE, NURSE. Stations, not exam sub-tests.",conversational:"Grammar + topics + fluent clinical conversation. No exam paper unless requested.","medical-english":"Ward language, case presentation, explaining to non-specialists.",academic:"Papers, abstracts, hedging, presenting research.","job-interview":"STAR stories, NHS values, presenting competence in English.",mixed:"Name a primary destination. Secondary goals get seasoning, not equal airtime."};
+const SKILL_LABEL = {speaking:"Speaking",reading:"Reading",writing:"Writing",listening:"Listening",vocabulary:"Medical vocabulary",grammar:"Grammar",pronunciation:"Pronunciation / intelligibility"};
+const ACCENT_LABEL = {strong:"Strong accent — often hard to follow",moderate:"Moderate — clear if they slow down",clear:"Mostly clear"};
+const DEADLINE_LABEL = {"1w":"1 week","2w":"2 weeks","3w":"3 weeks","4w":"4 weeks","5w":"5 weeks","6w":"6 weeks","7w":"7 weeks","8w":"8 weeks","10w":"10 weeks","12w":"3 months","16w":"4 months","20w":"5 months","24w":"6 months","36w":"9 months","52w":"12 months","12m-plus":"More than 12 months",none:"No fixed deadline"};
+const CONFIDENCE_LABEL = {"very-low":"Very low",low:"Low",moderate:"Moderate",good:"Good",high:"High"};
+const HOMEWORK_LABEL = {"very-light":"Very light — 5–10 min",light:"Light — 10–20 min",moderate:"Moderate — 20–40 min",high:"High — 40+ min"};
+
+const SAMPLE_TRIALS = {
+  aglailton:{studentName:"Aglailton",duration:50,profession:"surgeon",level:"b2-upper",skills:["speaking","reading"],goal:"oet-medicine",accent:"moderate",timeline:"16w",confidence:"good",homeworkCapacity:"moderate"},
+  razik:{studentName:"Razik",duration:50,profession:"gp",level:"b1-b2",skills:["reading","writing"],goal:"oet-medicine",accent:"moderate",timeline:"4w",confidence:"low",homeworkCapacity:"high"},
+  zita:{studentName:"Zita",duration:50,profession:"med-student",level:"b1-b2",skills:["speaking","grammar","vocabulary"],goal:"conversational",accent:"moderate",timeline:"none",confidence:"moderate",homeworkCapacity:"light"}
+};
+const empty = {studentName:"",duration:50,profession:"gp",level:"b1-b2",skills:[],goal:"oet-medicine",accent:"moderate",timeline:"8w",confidence:"moderate",homeworkCapacity:"moderate"};
+
+/* ---------------------------------------------------------------------
+   1. TIMELINE COMPRESSION — four modes, each genuinely different
+   --------------------------------------------------------------------- */
+const MODE = {
+  SPRINT: "sprint",           // ≤ 4 weeks — Extreme Sprint
+  INTENSIVE: "intensive",     // 5–8 weeks
+  STANDARD: "standard",       // 9–16 weeks
+  SUSTAINABLE: "sustainable"  // open / long-term / conversational default
+};
+function weeksFor(deadline){
+  const map={"1w":1,"2w":2,"3w":3,"4w":4,"5w":5,"6w":6,"7w":7,"8w":8,"10w":10,"12w":12,"16w":16,"20w":20,"24w":24,"36w":32,"52w":40,"12m-plus":24,none:12};
+  return map[deadline]||12;
+}
+function modeFor(input){
+  if(input.goal==="conversational" && input.timeline==="none") return MODE.SUSTAINABLE;
+  const w = weeksFor(input.timeline);
+  if(input.timeline==="none" || input.timeline==="12m-plus") return MODE.SUSTAINABLE;
+  if(w<=4) return MODE.SPRINT;
+  if(w<=8) return MODE.INTENSIVE;
+  if(w<=16) return MODE.STANDARD;
+  return MODE.SUSTAINABLE;
+}
+const MODE_META = {
+  sprint:{ label:"Extreme Sprint", badgeClass:"mode-sprint",
+    sessionsPerWeek:3, minutesFocusRatio:0.92,
+    description:"Almost everything non-essential is cut. Every session is exam-shaped from session one. No warm general-English time, no exploratory grammar — only the highest-yield leak, drilled to automaticity, retested immediately." },
+  intensive:{ label:"Intensive", badgeClass:"mode-intensive",
+    sessionsPerWeek:2, minutesFocusRatio:0.8,
+    description:"High density but sustainable. Primary skill leads every session; one secondary skill gets 10–15 minutes of deliberate maintenance so it doesn't collapse before the exam." },
+  standard:{ label:"Standard", badgeClass:"mode-standard",
+    sessionsPerWeek:2, minutesFocusRatio:0.65,
+    description:"Diagnostic-led sequencing with room to build properly: foundational grammar and pronunciation are taught, not just patched, and a full mock sits at the two-thirds mark." },
+  sustainable:{ label:"Sustainable", badgeClass:"mode-sustainable",
+    sessionsPerWeek:1, minutesFocusRatio:0.55,
+    description:"Open-ended, paced for retention over years, not weeks. Grammar and topics build in parallel; the student's real clinical week drives content choice as much as any syllabus." }
+};
+
+/* ---------------------------------------------------------------------
+   2. CONFIDENCE + HOMEWORK CAPACITY — deep influence
+   --------------------------------------------------------------------- */
+const CONFIDENCE_WEIGHT = {"very-low":0, low:1, moderate:2, good:3, high:4};
+const HOMEWORK_WEIGHT = {"very-light":0, light:1, moderate:2, high:3};
+
+function scaffoldProfile(input){
+  const c = CONFIDENCE_WEIGHT[input.confidence];
+  const h = HOMEWORK_WEIGHT[input.homeworkCapacity];
+  const mode = modeFor(input);
+  // Tone & scaffolding level
+  let tone, correctionStyle, newItemsPerLesson, homeworkTasks, homeworkMinutes;
+  if(c<=1){
+    tone = "Warm, slow, heavily validating. Praise attempts before correcting. Never stack more than one correction in a turn.";
+    correctionStyle = "Delayed, batched correction at the end of the task — not mid-sentence. Model the correct form once, then move on.";
+  } else if(c===2){
+    tone = "Encouraging but direct. Correct in the moment for high-value errors only; let low-value slips pass.";
+    correctionStyle = "Immediate correction for the target structure of the day; recast (repeat it back correctly) for everything else.";
+  } else {
+    tone = "Direct, efficient, peer-to-peer. Treat them as a competent professional who needs precision, not reassurance.";
+    correctionStyle = "Immediate, unhedged correction. Push back on vague or hedge-heavy answers — this is exam/workplace conditions.";
+  }
+  // Homework load — capacity is the hard ceiling; confidence nudges difficulty within it
+  const capMinutes = {"very-light":8, light:15, moderate:30, high:50};
+  homeworkMinutes = capMinutes[input.homeworkCapacity];
+  // high-homework-capacity students get slightly more volume, without overwhelming — +1 task band, capped
+  let taskBand = h; // 0..3
+  if(input.homeworkCapacity==="high") taskBand = Math.min(taskBand+1, 3);
+  homeworkTasks = taskBand===0 ? 1 : taskBand===1 ? "1–2" : taskBand===2 ? "2–3" : "3–4";
+  newItemsPerLesson = c<=1 ? 1 : (c===2 ? 2 : 3);
+  // Sprint mode caps new items hard, regardless of confidence — ruthless prioritisation
+  if(mode===MODE.SPRINT){
+    newItemsPerLesson = 1;
+    homeworkMinutes = Math.min(homeworkMinutes, 15); // short, brutal, high-repetition — not long
+    homeworkTasks = h<=1 ? "1 short repeated drill" : "2 short repeated drills";
+  }
+  // Low-confidence students get more structured frames explicitly flagged
+  const structuredFrames = c<=1;
+  return { tone, correctionStyle, newItemsPerLesson, homeworkTasks, homeworkMinutes,
+    confidenceScore:c, homeworkScore:h, structuredFrames };
+}
+
+/* ---------------------------------------------------------------------
+   3. LEVEL DIFFERENTIATION — real ceiling and floor
+   --------------------------------------------------------------------- */
+const LEVEL_PROFILE = {
+  a2: { pace:"Very slow. One target per session, recycled three times before moving on.", scaffolding:"Heavy — sentence frames, gap-fills, visual supports, tutor models every answer first.", ceiling:"Survival transactional English only. Do not attempt inference or nuance tasks.", raisedCeiling:false },
+  "b1-low": { pace:"Slow, deliberate. New structures introduced with a written frame the student fills.", scaffolding:"Heavy scaffolding — sentence starters, word banks, tutor co-constructs the first answer.", ceiling:"Can manage a simple consult with support. Complex hedging and register-shifting are out of reach for now — park them.", raisedCeiling:false },
+  "b1-b2": { pace:"Moderate. Structures introduced, practised with support, then attempted freely within the same session.", scaffolding:"Light-to-moderate — word banks available but not compulsory; correction is explicit.", ceiling:"Can do the exam task but leaks accuracy and ICE under pressure. This is the default OET-candidate profile.", raisedCeiling:false },
+  "b2-upper": { pace:"Efficient. Minimal repetition — one clean model, then straight into high-density practice.", scaffolding:"Minimal — student self-corrects with a prompt; tutor intervenes only on high-value errors. Do not over-scaffold: no sentence frames, no word banks unless specifically requested.", ceiling:"Fluent enough to mask real gaps. Push clinical communication nuance (empathy, hedging, register) rather than basic grammar. Higher-order goals apply — see raised-ceiling content.", raisedCeiling:true },
+  c1: { pace:"Fast, dense. New material is advanced clinical nuance, not foundational grammar.", scaffolding:"None. The student should be challenged, not supported. Treat errors as register or precision issues, not learning gaps. No frames, no word banks, no slowed speech.", ceiling:"Must be stretched: complex hedging, breaking bad news, handling interruption and challenge, subtle register shifts between colleague / patient / family. Never assign beginner-level material. Higher-order goals apply — see raised-ceiling content.", raisedCeiling:true }
+};
+// Higher-order content unlocked only for Upper B2 / C1 — role-plays, language goals, feedback dimensions
+const RAISED_CEILING = {
+  rolePlayScenarios:[
+    "Managing diagnostic uncertainty out loud with a patient who wants a definite answer now.",
+    "Breaking a difficult or unexpected finding to a patient who was expecting good news.",
+    "Handling an angry patient or family member who feels dismissed by a previous consultation.",
+    "Responding to a highly educated patient (e.g. a colleague from another specialty, or a patient who has researched their condition) who challenges the plan.",
+    "Negotiating disagreement with a senior colleague on a management plan, professionally."
+  ],
+  languageGoals:[
+    "Stance and hedging: hold a position while leaving room for revision ('my working assumption is…', 'I'd want to see the repeat bloods before committing to…').",
+    "Professional distance: warmth without over-familiarity, especially in bad-news or conflict scenarios.",
+    "Clinical reasoning language: making your reasoning audible ('the reason I'm not worried about X yet is…') rather than just stating conclusions.",
+    "De-escalation register: naming the emotion in the room without being clinical or cold about it."
+  ],
+  byProfession:{
+    surgeon:[
+      "A patient's post-operative histology is ambiguous — it may be benign, but a malignancy cannot yet be excluded. Explain what you know, what you don't, and what happens next, without false reassurance or unnecessary alarm.",
+      "A colleague from another specialty challenges your decision to operate rather than manage conservatively. Defend your reasoning professionally, and acknowledge the legitimate part of their concern."
+    ],
+    gp:[
+      "A well-informed patient (a retired pharmacist) questions your choice of medication and cites guidelines. Hold your position where it is sound, concede where they are right, and stay collegial rather than defensive.",
+      "Investigations are inconclusive and the patient wants a firm diagnosis today. Manage that uncertainty out loud, and safety-net without sounding evasive."
+    ],
+    nurse:[
+      "A family member is angry that their relative's discharge was delayed and blames the nursing team. Acknowledge the emotion, hold professional distance, and explain the clinical reason without becoming defensive.",
+      "You must escalate a concern about a patient to a senior doctor who is dismissive. Use assertive, precise language that is professional rather than confrontational."
+    ],
+    "med-student":[
+      "Your consultant asks 'why not X?' and you are unsure. Give your reasoning honestly, flag the limit of your knowledge, and avoid both bluffing and collapsing.",
+      "A patient asks you a question you cannot fully answer. Manage the boundary of your role without sounding evasive or unprofessional."
+    ],
+    resident:[
+      "A senior consultant challenges your overnight management decision in front of the whole team on the ward round. Defend your reasoning with the information you had at the time, without becoming defensive or over-apologising.",
+      "You are the only doctor on the ward at night and a patient's family wants a firm answer about prognosis that is genuinely still uncertain. Hold the uncertainty honestly while still giving them something to hold onto."
+    ],
+    specialist:[
+      "A patient who has thoroughly researched their condition challenges your recommended approach and cites a study you haven't read. Engage with their reasoning seriously, hold your clinical position where it's justified, and concede where they have a fair point.",
+      "You must deliver a finding that is significantly worse than the patient was expecting, in a single appointment slot with no extra time booked. Manage the pacing and the news itself without rushing or overrunning so badly that the next patient is badly delayed."
+    ],
+    other:[
+      "Manage a conversation where the honest answer is 'we don't know yet' while keeping the other person's trust."
+    ]
+  },
+  feedbackDimensions:["Accuracy (as always)","Appropriacy — was the register right for this listener, not just grammatically correct?","Impact — did the message land the way it was intended, or did precision get lost in hedging (or vice versa)?"]
+};
+
+/* ---------------------------------------------------------------------
+   4. PROFESSION + GOAL ADAPTATION
+   --------------------------------------------------------------------- */
+const PROFESSION_ROLEPLAY = {
+  surgeon: { bank:"Pre-op consent conversations, post-op complication disclosure, MDT case presentation, explaining risk in lay terms without hedging away the seriousness.", successCriteria:"Can state risk plainly, obtain informed consent in lay language, and hand over a case crisply to a colleague.",
+    cases:[
+      { name:"Margaret Doyle", age:67, background:"Retired schoolteacher, lives alone, mildly anxious about hospitals since a previous bad experience with anaesthesia.", complaint:"Scheduled for laparoscopic cholecystectomy; here for pre-op consent.", hiddenConcern:"Worried she won't wake up from the anaesthetic but hasn't said so directly — keeps asking indirect questions about 'what happens during'.", success:"Student notices the indirect questioning, names the underlying fear directly, and reassures without dismissing it, before completing consent." },
+      { name:"Aigerim Bekova", age:41, background:"Works two jobs, primary carer for her mother, cannot afford much time off.", complaint:"Day 2 post-appendicectomy, new fever 38.4°C and increasing wound pain.", hiddenConcern:"Desperate to be discharged today regardless of symptoms because of caring responsibilities — may underreport pain to speed discharge.", success:"Student picks up on the discharge pressure, explains clearly why fever changes the plan, and negotiates a realistic timeline instead of just refusing." },
+      { name:"Tomasz Nowak", age:55, background:"Long-haul lorry driver, stoic, minimal health-seeking history, sceptical of doctors in general.", complaint:"Post-op review after inguinal hernia repair; reports the wound 'still doesn't feel right' three weeks on.", hiddenConcern:"Afraid this means he can't return to driving and will lose income — downplays symptoms to avoid hearing bad news.", success:"Student draws out the real concern about work capacity, gives an honest, specific timeline, and avoids vague reassurance." }
+    ] },
+  gp: { bank:"Full consultation cycle: history → examination framing → explanation → safety-netting, under real time pressure (8–10 min).", successCriteria:"Completes ICE, gives a structured explanation, and safety-nets clearly within a realistic consultation length.",
+    cases:[
+      { name:"Daniel Osei", age:29, background:"Software developer, health-anxious, has already researched symptoms online.", complaint:"3-day history of worsening sore throat and difficulty swallowing, low-grade fever.", hiddenConcern:"Convinced it might be something serious (has read about epiglottitis) and wants explicit reassurance or explicit red flags, not vague reassurance.", success:"Student addresses the specific researched fear directly, gives clear red-flag safety-netting, and doesn't dismiss the online research." },
+      { name:"Fatima Haidari", age:34, background:"Recently arrived refugee, limited prior contact with this healthcare system, accompanied by a young child.", complaint:"Persistent headaches for 2 weeks, difficulty sleeping.", hiddenConcern:"Underlying stress and displacement-related anxiety she hasn't named — may present as purely physical.", success:"Student uses open ICE questions, creates space for the psychosocial context to emerge without forcing it, and avoids purely biomedical tunnel vision." },
+      { name:"Robert Kane", age:72, background:"Widower, lives alone, multiple comorbidities, sees his GP often and feels like 'a burden'.", complaint:"Routine diabetes review, mentions in passing he's been 'a bit more tired than usual'.", hiddenConcern:"Minimising symptoms because he doesn't want to be seen as a frequent attender — 'a bit tired' may be underplaying something significant.", success:"Student notices the minimising language, gently probes further rather than accepting the vague description at face value." }
+    ] },
+  nurse: { bank:"Patient education before discharge, explaining side-effects, handover (SBAR), calming an anxious family member.", successCriteria:"Teaches back-checked patient education, accurate SBAR handover, de-escalates without minimising.",
+    cases:[
+      { name:"Wei Zhang", age:61, background:"Recently diagnosed with AF, started on a new anticoagulant, lives with adult daughter.", complaint:"Discharge tomorrow — needs education on the new medication.", hiddenConcern:"Worried about bleeding risk after hearing a relative's bad experience, may not admit confusion about missed-dose instructions.", success:"Student teach-back checks understanding rather than just reciting instructions, and directly addresses the bleeding-risk fear." },
+      { name:"Mrs. Adaeze Owusu (mother of Grace, 8)", age:36, background:"Single parent, works night shifts as a care assistant, Grace is her first child to have surgery.", complaint:"Day 1 post-tonsillectomy under a paediatric ward; asking rapid-fire questions about pain relief doses, bleeding, and diet before taking Grace home.", hiddenConcern:"She is afraid to leave Grace alone during her night shifts and has not told anyone she has no other adult to help, so she will push for reassurance rather than admit she cannot cope alone.", success:"Student paces the information, checks in with the mother's emotional state, and confirms the top 3 safety points are retained before finishing." },
+      { name:"Patrick Byrne", age:78, background:"Frail, mild hearing impairment, wife present and worried.", complaint:"Handover to the next shift after a fall risk assessment.", hiddenConcern:"Family worried he'll be sent home 'too soon' and unsafe — this needs to be addressed, not just handed over clinically.", success:"SBAR handover is accurate and complete, and the family's safety concern is acknowledged directly, not brushed past." }
+    ] },
+  "med-student":{ bank:"OSCE-style history taking and case presentation, explaining a plan to a senior without sounding junior or uncertain.", successCriteria:"Structured history, confident case presentation, can answer a follow-up question without collapsing into hedges.",
+    cases:[
+      { name:"Mr. Karim Alavi", age:54, background:"Bus driver, smoker (25 pack-years), disorganised historian who jumps between timelines and downplays symptoms.", complaint:"Admitted overnight with 2 days of central abdominal pain moving to the right iliac fossa, temp 37.9°C, HR 96, nausea but no vomiting.", hiddenConcern:"Afraid the hospital stay will cost him his licence and job, so he minimises pain scores and avoids mentioning the alcohol he has been drinking to cope.", success:"Student keeps a structured history despite the non-linear answers, asks about alcohol and social impact without judgement, and presents a concise one-minute summary to the registrar." },
+      { name:"Ms. Elena Petrova", age:23, background:"Postgraduate student, anxious, brought in by her flatmate; answers in short sentences and avoids eye contact.", complaint:"Two episodes of syncope this week, palpitations, BP 100/62, HR 112, no prior cardiac history.", hiddenConcern:"She has been restricting food for months and is terrified the doctor will 'find out'. She will only disclose if asked sensitively and directly.", success:"Student takes a sensitive dietary and psychosocial history without accusation, and in the case presentation flags the uncertainty honestly instead of overstating a diagnosis." },
+      { name:"Mrs. Beatrice Mensah", age:69, background:"Retired seamstress, sharp but proud, daughter is present and keeps answering for her.", complaint:"Three-week history of worsening breathlessness, ankle swelling, 2 extra pillows at night, on ramipril and amlodipine.", hiddenConcern:"She stopped taking her water tablets because they made her rush to the toilet during her church service, and is embarrassed to say so in front of her daughter.", success:"Student redirects gently to the patient, finds the adherence gap, and presents the case with a clear differential and one honest 'I am not sure about' point when the consultant challenges them." }
+    ] },
+  resident: { bank:"Ward-level autonomy without a senior physically present: overnight deterioration calls, escalation judgement, defending a management plan on the post-take round, and family conversations under uncertainty.", successCriteria:"Makes and states a clear decision at the right grade of responsibility, escalates when it's genuinely needed (not as a reflex or as an avoidance), and can defend the reasoning afterwards without becoming defensive.",
+    cases:[
+      { name:"Mr. Patrick O'Malley", age:81, background:"Long-term care resident with COPD and mild dementia, admitted with pneumonia; you are the only doctor covering the ward overnight.", complaint:"Increasing confusion and dropping oxygen saturations (89% on 4L) at 2am — nursing staff have called you to the bedside.", hiddenConcern:"His daughter, at the bedside, is terrified that any conversation about ceilings of care means the team is 'giving up' on her father, and no one has spoken to her yet tonight.", success:"Resident assesses and escalates appropriately for their grade, and has an honest, sensitive conversation with the daughter that neither over-promises nor sounds like giving up." },
+      { name:"Ms. Julia Ferreira", age:34, background:"Primigravida at 32 weeks, admitted under obstetrics; you are the medical registrar called to review new-onset hypertension and headache.", complaint:"BP 158/102, mild epigastric discomfort, no other red flags yet, but the picture is evolving.", hiddenConcern:"She overheard a nurse say 'pre-eclampsia' and is quietly terrified but hasn't asked directly — she keeps changing the subject to whether she can go home this week.", success:"Resident names the possibility clearly rather than dodging it, explains next steps without causing unnecessary alarm, and escalates to the obstetric team promptly." },
+      { name:"Mr. David Chen", age:59, background:"Known type 2 diabetic and smoker, admitted 3 days ago for a diabetic foot infection; you are covering the ward and reviewing him before the consultant round.", complaint:"He is refusing the recommended IV antibiotics today, saying he 'feels fine' and wants to go home.", hiddenConcern:"He is the sole carer for his wife, who has early dementia, and is convinced no one else can manage her for even one more night — he hasn't told the team this directly.", success:"Resident explores the reason behind the refusal rather than repeating the clinical risk, involves the right support where relevant, and documents a clear, defensible plan whichever way the conversation goes." }
+    ] }
+};
+Object.keys(PROFESSION_ROLEPLAY).forEach(k=>{ if(!PROFESSION_ROLEPLAY[k].cases) PROFESSION_ROLEPLAY[k].cases = []; });
+// remaining professions keep their existing single-line bank without full case detail (lower priority per spec: "every major profession")
+Object.assign(PROFESSION_ROLEPLAY, {
+  midwife: { bank:"Discussing birth preferences, consent under time pressure, involving a partner without excluding the patient.", successCriteria:"Shares decisions clearly, checks understanding, keeps both patient and partner engaged appropriately.", cases:[] },
+  paramedic: { bank:"Rapid handover under time pressure, calming a scene, closed-loop communication with control.", successCriteria:"Handover is complete, ordered, and fast — no redundant words, no missed vitals.", cases:[] },
+  specialist: { bank:"Explaining complex findings to a non-specialist colleague or patient, MDT discussion, second-opinion conversations.", successCriteria:"Translates specialist content into plain language without losing clinical accuracy.",
+    cases:[
+      { name:"Mr. Andrew Whitfield", age:52, background:"Retired engineer, methodical, has already read extensively about his condition online and prepared a list of questions.", complaint:"Referred with an incidental 2cm indeterminate lung nodule found on a scan done for an unrelated reason.", hiddenConcern:"Convinced it is cancer and that the team is delaying telling him the truth by using words like 'indeterminate' — he wants a direct answer even though a direct answer isn't yet possible.", success:"Specialist explains genuine diagnostic uncertainty clearly, resists the pressure to over-promise a timeline, and gives him a concrete, dated next step rather than vague reassurance." },
+      { name:"Dr. Priya Nair", age:44, background:"Referring GP, calling directly rather than writing, between her own patients.", complaint:"Wants a plain-language summary of a patient's abnormal MRI report she can relay to the patient today, without waiting for the formal letter.", hiddenConcern:"She is worried about how to phrase the findings without either alarming her patient or understating something significant, and is quietly asking the specialist to help her get the tone right, not just the facts.", success:"Specialist translates the finding into lay-appropriate language a GP could reuse directly, and explicitly flags which parts need careful phrasing." },
+      { name:"Mrs. Helen Osborne", age:67, background:"Recently widowed, attending alone, was expecting today's appointment to be a routine follow-up.", complaint:"Comes in for review of results that show unexpected progression of her condition, worse than the last scan suggested.", hiddenConcern:"She had privately decided that if things were bad she would stop treatment altogether, but hasn't told her family or the team this — she is waiting to see if the specialist raises quality-of-life options first.", success:"Specialist delivers the unexpected finding clearly without a rehearsed script, and creates space for her preferences to surface rather than launching straight into next-step options." }
+    ] },
+  vet: { bank:"Explaining findings and a treatment plan to an owner, discussing cost and euthanasia sensitively.", successCriteria:"Plain-language explanation, checks owner understanding, handles emotional moments without becoming clinical/cold.", cases:[] },
+  allied: { bank:"Explaining a procedure step-by-step, managing expectations, teaching a home exercise or care routine.", successCriteria:"Clear step-by-step instruction the patient could repeat back correctly.", cases:[] },
+  other: { bank:"Adapt register to the actual workplace context the student describes; do not force a classic OET script.", successCriteria:"Defined case-by-case with the student in session one.", cases:[] }
+});
+
+function goalTrackFor(input){
+  if(input.goal.startsWith("oet")) return "oet";
+  if(input.goal==="osce") return "osce";
+  if(input.goal==="conversational") return "conversational";
+  if(input.goal==="mixed") return "mixed";
+  return "workplace";
+}
+
+/* ---------------------------------------------------------------------
+   5. DIAGNOSTIC DEPTH — per-skill diagnostic tasks & scoring
+   --------------------------------------------------------------------- */
+const SKILL_DIAGNOSTIC = {
+  speaking:{ task:"Timed role-play in the student's real specialty context.", watch:["Intelligibility under pressure","ICE (Ideas, Concerns, Expectations) asked and used, not performed","Whether lay explanations survive contact with a real patient","Rapport language vs. mechanical script-following"] },
+  reading:{ task:"Timed expeditious-reading extract (Part A style) plus one inference item (Part B/C style).", watch:["Scanning speed vs. linear reading","Negatives, exceptions and dosages missed under the clock","Ability to locate the evidence sentence, not just the topic","Confusing purpose, detail and writer attitude"] },
+  writing:{ task:"Timed short-form writing task: give the student a brief case-note extract (e.g. discharge summary points or a referral trigger) and 12 minutes to produce a short referral letter or discharge-summary paragraph.", watch:["Purpose stated in sentence one — a reader should know why they're reading it immediately","Content selection: what was correctly included vs. what should have been left out (transformed, not transcribed)","Organisation — logical paragraph order, not the order the notes were given in","Tone and register — appropriate for a professional reader, not a patient","Grammar accuracy specifically under time pressure — does it collapse when rushed?"], observableCriteria:[
+      "ORGANISATION — Purpose appears in sentence one (yes/no). Paragraphs follow reader need (reason → relevant history → request), not the order of the notes.",
+      "TONE — Register is professional and consistent; no patient-facing softeners, no over-familiar phrasing, no abrupt commands to a senior reader.",
+      "INCLUSION — Every relevant clinical detail present (diagnosis, key findings, current medication, action requested). Count omissions.",
+      "EXCLUSION — Irrelevant detail cut (unrelated history, exact timestamps, social detail that does not change management). Count inclusions that should have been cut.",
+      "GRAMMAR UNDER TIME PRESSURE — Compare accuracy in the first third vs. the last third of the letter. Note where tenses, articles or agreement start slipping.",
+      "TIMING — Finished within 12 minutes (yes/no). If not, note whether the ending was rushed or missing."
+    ] },
+  listening:{ task:"Short workplace audio extract with note-completion.", watch:["Detail and number capture under the clock","Whether ICE is captured in a consult extract, not just words","Note-taking system efficiency","Speaker attitude / inference in a longer extract"] },
+  vocabulary:{ task:"Rapid lay-vs-clinical term swap drill in the student's specialty.", watch:["Hospital/workplace vocabulary range","Ability to move between lay and clinical register on demand","Symptom-description vocabulary specifically"] },
+  grammar:{ task:"Elicited short clinical narrative (history or handover).", watch:["Tense accuracy on the clinical timeline","Question formation under pressure","Article and noun-phrase control","Hedging vs. over-certainty in uncertain findings"] },
+  pronunciation:{ task:"Read-aloud list of high-value medical terms + spontaneous use in a sentence.", watch:["Which 2–3 sounds are actually costing intelligibility (not a generic accent judgement)","Word stress on multisyllabic medical terms","Chunking — natural phrasing vs. robotic word-by-word delivery","Numbers, doses and measurements specifically"] }
+};
+
+// severity scoring driven by level + accent + confidence, deterministic but skill-specific
+function severityFor(skill, input){
+  const levelRank = {a2:0,"b1-low":1,"b1-b2":2,"b2-upper":3,c1:4}[input.level];
+  let base = 2; // moderate
+  if(input.skills[0]===skill) base = 3; // lead skill is the presenting complaint — treat as higher-priority
+  if(skill==="pronunciation" && input.accent==="strong") base = Math.max(base,3);
+  if(skill==="reading" && levelRank<=1) base = Math.max(base,3);
+  if(skill==="writing" && levelRank<=1) base = Math.max(base,3); // low-level writing is just as high-priority as low-level reading
+  if(levelRank===4) base = Math.min(base,2); // C1 rarely "critical" on mechanics — issue is nuance, not basics
+  return base; // 1 low, 2 moderate, 3 high/critical
+}
+function severityLabel(n){ return n>=3 ? {text:"High priority", cls:"crit"} : n===2 ? {text:"Moderate", cls:"high"} : {text:"Maintenance", cls:"mod"}; }
+
+function diagnosticHypothesis(input){
+  const lead = input.skills[0] || "speaking";
+  const levelP = LEVEL_PROFILE[input.level];
+  const accentNote = input.accent==="strong"
+    ? " Accent load is high enough that the mini-teach component must be a targeted pronunciation drill, not folded generically into the speaking task."
+    : input.accent==="moderate"
+      ? " Accent is manageable but should still get 5–8 minutes of targeted work per session so it doesn't resurface under exam pressure."
+      : " Accent is not the leak — do not spend session time on it; redirect that time to the primary skill.";
+  const map = {
+    speaking:`Presenting complaint is spoken clinical communication. At ${LEVEL_LABEL[input.level]}, the working hypothesis is that fluency masks structural gaps in ICE and lay-explanation — not raw vocabulary. Confirm by checking whether corrected language is retained on a second attempt within the same session.`,
+    reading:`Presenting complaint is reading under time pressure. At ${LEVEL_LABEL[input.level]}, the working hypothesis is a scanning-speed deficit rather than a comprehension deficit — the student likely understands the language but runs out of time locating it. Confirm by comparing untimed vs. timed accuracy on the same extract type.`,
+    writing:`Presenting complaint is written transformation. The working hypothesis is content-selection failure (transcribing notes rather than transforming them for the reader) rather than a grammar-accuracy problem. Confirm by checking whether purpose appears in sentence one.`,
+    listening:`Presenting complaint is listening under pressure. The working hypothesis is a note-taking system failure rather than a raw comprehension gap — confirm by replaying the extract and checking if accuracy improves substantially on a second pass.`,
+    vocabulary:`Presenting complaint is vocabulary range, specifically the lay/clinical register switch. Confirm by testing the same concept in both registers back to back.`,
+    grammar:`Presenting complaint is grammatical accuracy under production pressure. The working hypothesis is tense confusion on the clinical timeline specifically (not general grammar) — confirm with a short elicited narrative that forces past/present-perfect contrast.`,
+    pronunciation:`Presenting complaint is intelligibility. The working hypothesis is that 2–3 specific sounds or stress patterns are responsible for most of the loss, not a generalised accent issue. Confirm by isolating the exact words that caused a comprehension check to fail.`
+  };
+  const raisedNote = LEVEL_PROFILE[input.level].raisedCeiling
+    ? ` This student is Upper B2/C1 — do not over-scaffold. Feedback should extend beyond accuracy to appropriacy and impact, and role-play content should move toward managing uncertainty, hedging, and higher-stakes patient dynamics rather than basic transactional language.`
+    : '';
+  return (map[lead] || map.speaking) + accentNote + raisedNote;
+}
+
+/* ---------------------------------------------------------------------
+   6. GRAMMAR & PRONUNCIATION MICRO-COMPONENTS (selected from diagnostic)
+   --------------------------------------------------------------------- */
+const GRAMMAR_BANK = [
+  { id:"G-U1.1", title:"Past simple for completed clinical events", level:["a2","b1-low","b1-b2"], tags:["speaking","grammar"], explanation:"Use past simple for events that started and finished: admission, a single episode, a procedure.", example:"The pain started after dinner. We stopped the ACE inhibitor yesterday.", mistake:"He has been admitted yesterday." },
+  { id:"G-U1.2", title:"Present perfect for unfinished time / symptom duration", level:["b1-low","b1-b2","b2-upper"], tags:["speaking","grammar","listening"], explanation:"Has/have + past participle for symptoms that started in the past and continue.", example:"He has had this pain for three days.", mistake:"He has this pain since three days." },
+  { id:"G-U2.1", title:"Symptom quality, site, radiation", level:["b1-low","b1-b2"], tags:["speaking","vocabulary"], explanation:"Build: It is a [quality] pain in the [site], radiating to the [site].", example:"It is a tight pain in the centre of the chest, radiating to the left arm.", mistake:"It have pain." },
+  { id:"G-U3.1", title:"Reporting numbers and trends", level:["b1-b2","b2-upper"], tags:["writing","reading","grammar"], explanation:"State a value and whether it rose, fell, or stayed — needed for both writing and reading detail questions.", example:"Her oxygen saturations dropped to 88% on air.", mistake:"The saturations are go down." },
+  { id:"G-U4.1", title:"Hedging and degrees of certainty", level:["b2-upper","c1"], tags:["speaking","grammar"], explanation:"Use modal hedging to express clinical uncertainty accurately without sounding evasive: 'it's possible that', 'I'd want to rule out', 'this could suggest'.", example:"This could suggest an infective process, but I'd want to rule out a cardiac cause first.", mistake:"Maybe it is infection or maybe not, I don't know exactly (under-hedged, sounds unprofessional)." },
+  { id:"G-U4.2", title:"Passive voice for process description", level:["b2-upper","c1"], tags:["writing","reading"], explanation:"Passive voice for procedures and processes where the agent is unimportant — common in OET writing and case notes.", example:"The wound was closed in two layers.", mistake:"We closed the wound in two layers (register mismatch for formal writing)." },
+  { id:"G-U5.1", title:"Question formation under pressure", level:["a2","b1-low","b1-b2"], tags:["speaking","grammar"], explanation:"Auxiliary-first question order collapses under pressure in real consults — drill until automatic.", example:"Have you noticed any change in your breathing?", mistake:"You noticed change in breathing?" },
+];
+const PRONUNCIATION_BANK = [
+  { id:"P-1.2", title:"High-value medical consonants (th, sh, ch, v, f, r)", tags:["pronunciation"], accentFocus:true, explanation:"Sounds that repeatedly appear in medical terms and change word identity.", words:"therapy, thoracic, thrombosis, diagnosis, surgery, vascular, respiratory" },
+  { id:"P-1.3", title:"Vowel length that changes meaning", tags:["pronunciation"], accentFocus:true, explanation:"Ship/sheep, live/leave, full/fool — get these wrong and the listener hunts for a different word.", words:"feel/fill, leave/live, sleep/slip" },
+  { id:"P-2.2", title:"Multisyllabic medical word stress", tags:["pronunciation","vocabulary"], accentFocus:false, explanation:"3–6 syllable terms. Wrong stress makes the word unrecognisable even with correct sounds.", words:"cardioVAScular, hyperTENsion, resPIRatory, neuroLOGical, investiGAtion" },
+  { id:"P-3.1", title:"Chunking and natural phrasing", tags:["speaking","pronunciation"], accentFocus:false, explanation:"Group words into meaning-chunks rather than word-by-word delivery — this alone raises perceived fluency sharply.", words:"I'd like to / examine your abdomen / if that's alright." },
+  { id:"P-4.1", title:"Numbers, doses and measurements", tags:["writing","listening","pronunciation"], accentFocus:false, explanation:"Precision on numbers is safety-critical and frequently mis-stressed or mis-heard.", words:"15mg twice daily, 150 over 90, point-five millilitres" }
+];
+/* Ready-made language frames — given to low-confidence students (and heavy-scaffold levels) */
+const LANGUAGE_FRAMES = {
+  speaking:[
+    "Thank you for coming in. Can you tell me what has been troubling you?",
+    "I can see this is worrying for you. What concerns you most?",
+    "What were you hoping we could do today?",
+    "Let me check I have understood. You said ______ . Is that right?",
+    "What I would suggest is ______ . How does that sound to you?",
+    "I want to make sure I've got this right — could you say that again, a little more slowly?",
+    "I'm not sure about that yet, so let me check before I answer you."
+  ],
+  reading:[
+    "The question is asking me to find: ______ .",
+    "The key word to scan for is ______ , and the words around it are ______ .",
+    "The text says ______ , so the answer is ______ , not ______ .",
+    "Watch for: not / except / unless / only / without."
+  ],
+  writing:[
+    "I am writing to refer ______ , a ___-year-old ______ , who presents with ______ .",
+    "On examination, ______ . Investigations showed ______ .",
+    "I would be grateful if you could ______ .",
+    "Please do not hesitate to contact me if you require further information.",
+    "Diagnosis: ______ . Current management: ______ . Reason for referral: ______ ."
+  ],
+  listening:[
+    "The speaker is talking about ______ .",
+    "The number / dose / time mentioned was ______ .",
+    "The speaker's main worry is ______ ."
+  ],
+  grammar:[
+    "The pain started ______ (when?) and has continued for ______ .",
+    "Have you noticed any ______ ?",
+    "He was admitted on ______ and discharged on ______ ."
+  ],
+  vocabulary:[
+    "In medical terms this is ______ . In simple words, it means ______ .",
+    "You may hear this called ______ . It is the same as ______ ."
+  ],
+  pronunciation:[
+    "Say it slowly: ______ . Now say it in a sentence: ______ .",
+    "The stress is on the ______ syllable."
+  ]
+};
+function framesFor(input){
+  const lead = input.skills[0] || "speaking";
+  const c = CONFIDENCE_WEIGHT[input.confidence];
+  const heavy = ["a2","b1-low"].includes(input.level);
+  const raised = LEVEL_PROFILE[input.level].raisedCeiling;
+  if(raised) return [];                              // never over-scaffold Upper B2 / C1+
+  if(c<=1 || heavy){                                 // low confidence or low level: full set
+    return LANGUAGE_FRAMES[lead] || LANGUAGE_FRAMES.speaking;
+  }
+  return [];                                         // others: no frames unless low-confidence
+}
+function pickGrammarFor(input, weekIdx){
+  const lead = input.skills[0] || "speaking";
+  const level = input.level;
+  const pool = GRAMMAR_BANK.filter(g => g.level.includes(level) || (level==="c1" && g.level.includes("b2-upper")));
+  const relevant = pool.filter(g => g.tags.includes(lead)) ;
+  const list = relevant.length ? relevant : pool;
+  return list[weekIdx % list.length] || GRAMMAR_BANK[0];
+}
+function pickPronunciationFor(input, weekIdx){
+  let pool = PRONUNCIATION_BANK;
+  if(input.accent==="strong") pool = PRONUNCIATION_BANK.filter(p=>p.accentFocus).concat(PRONUNCIATION_BANK.filter(p=>!p.accentFocus));
+  return pool[weekIdx % pool.length];
+}
+
+/* ---------------------------------------------------------------------
+   7. PROGRAMME DIRECTION + OFFER
+   --------------------------------------------------------------------- */
+function programDirection(input){
+  const mode = modeFor(input);
+  const meta = MODE_META[mode];
+  const weeks = weeksFor(input.timeline);
+  const goalLine = GOAL_LABEL[input.goal];
+  const lead = input.skills[0] || "speaking";
+  let rationale, cutNotice = null;
+  if(mode===MODE.SPRINT){
+    rationale = `${weeks} week(s) to the date. Extreme Sprint: ${meta.sessionsPerWeek} sessions/week, ${Math.round(meta.minutesFocusRatio*100)}% of session time on the single weakest skill (${SKILL_LABEL[lead]}). No exploratory content, no general-English warm-up, no secondary-skill maintenance block. Every task is exam-shaped from session one. Homework is short, high-repetition, and compulsory — checked at the start of the next session, not optional.`;
+    cutNotice = `Non-essential content has been removed because of the exam date. This programme deliberately omits: general fluency work, secondary-skill maintenance, exploratory grammar beyond the highest-frequency error patterns, and any topic not directly exam-relevant. Speaking practice is reduced to survival-level structure and safety language only — it is not being developed as a standalone skill in this window.`;
+  } else if(mode===MODE.INTENSIVE){
+    rationale = `${weeks} weeks to the date. Intensive mode: ${meta.sessionsPerWeek} sessions/week, primary skill (${SKILL_LABEL[lead]}) leads every session with ${Math.round(meta.minutesFocusRatio*100)}% of time; one secondary skill gets short deliberate maintenance so it doesn't collapse before the exam.`;
+  } else if(mode===MODE.STANDARD){
+    rationale = `${weeks} weeks toward ${goalLine}. Standard mode: diagnostic-led sequencing, room to actually teach foundational grammar and pronunciation rather than patch them, secondary skills folded in as maintenance, full timed mock at the two-thirds mark.`;
+  } else {
+    rationale = input.goal==="conversational"
+      ? `Conversational track, no fixed exam. Sustainable mode: grammar and clinical topics build in parallel, session by session, driven as much by the student's real clinical week as by a fixed syllabus. Pace protects long-term retention over short-term cramming.`
+      : `Open timeline toward ${goalLine}. Sustainable mode: paced for retention, ${meta.sessionsPerWeek} session/week as a default cadence, review cycles built in every 4–5 weeks rather than compressed.`;
+  }
+  return { mode, meta, rationale, weeks, cutNotice };
+}
+function offerFor(input){
+  const mode = modeFor(input);
+  if(mode===MODE.SPRINT) return {name:"Sprint package",cadence:`${MODE_META.sprint.sessionsPerWeek} sessions / week until the exam date, 50 minutes each.`,close:"The date is close enough that pace matters more than price. I'd rather start this week than have the perfect start next month."};
+  if(mode===MODE.INTENSIVE) return {name:"Intensive package",cadence:`${MODE_META.intensive.sessionsPerWeek} sessions / week, 50 minutes each, through to the exam date.`,close:"Two focused sessions a week gives enough repetition to close the gap without burning you out before the exam."};
+  if(input.goal==="conversational") return {name:"Ongoing conversational coaching",cadence:"1 session / week, 50 minutes, open-ended.",close:"No exam pressure here — this is about building real fluency you'll actually use on the ward, at a pace that fits your week."};
+  return {name:"Standard programme",cadence:"2 sessions / week, 50 minutes each.",close:"Two sessions a week gives enough repetition to move the leak we found today without burning you out before the exam."};
+}
+
+/* ---------------------------------------------------------------------
+   8. TRIAL SCRIPT PHASES (uses diagnostic depth + scaffold profile)
+   --------------------------------------------------------------------- */
+function buildTrialMatrix(input){
+  const skills = input.skills.length ? input.skills : ["speaking"];
+  return skills.map(sk => {
+    const d = SKILL_DIAGNOSTIC[sk];
+    const sev = severityFor(sk, input);
+    return { skill: sk, label: SKILL_LABEL[sk], task: d.task, watch: d.watch, observableCriteria: d.observableCriteria || null, severity: sev, sevInfo: severityLabel(sev) };
+  }).sort((a,b)=>b.severity-a.severity);
+}
+function buildPhases(input){
+  const scaffold = scaffoldProfile(input);
+  const lead = input.skills[0] || "speaking";
+  const matrix = buildTrialMatrix(input);
+  const phases = [];
+
+  phases.push({
+    kicker:"01", clock:"0:00", minutes:8, title:"Arrive and sample",
+    sections:[
+      {label:"Opening", kind:"quotes", items:["Thanks for making time today — before we dive in, tell me a bit about your work and what's bringing you to English tutoring right now."]},
+      {label:"Tone for this student", kind:"prose", items:[scaffold.tone]},
+      {label:"What you're listening for", kind:"bullets", items:["Baseline fluency and confidence vs. self-report","Whether they lead with anxiety about the exam or about the job itself",input.accent==="strong" ? "Natural accent load — confirm the mini-teach must be a targeted pronunciation drill" : "Natural accent load — confirm it is not the real leak"]}
+    ].concat(modeFor(input)===MODE.SPRINT && lead!=="speaking" ? [{label:"Sprint note", kind:"prose", items:["Speaking will not be developed as a standalone skill in this window — only survival-level structure and safety language (introducing yourself, confirming understanding, closing safely) gets folded into other tasks."]}] : [])
+  });
+
+  const leadDiag = SKILL_DIAGNOSTIC[lead];
+  const leadTitles = {
+    reading:"Scan, don't read — then prove it on one negative",
+    writing:"Purpose in sentence one — then stop",
+    listening:"Capture ICE, not just the words",
+    pronunciation:"Three high-yield sounds in words they will actually say",
+    grammar:"One grammar move on this topic",
+    vocabulary:"Lay vs. clinical — swap on demand",
+    speaking:"ICE asked and used — not performed"
+  };
+  phases.push({
+    kicker:"02", clock:"0:08", minutes:20, title: leadTitles[lead],
+    sections:[
+      {label:"Task", kind:"prose", items:[leadDiag.task]},
+      {label:"Diagnostic watch-points", kind:"bullets", items:leadDiag.watch},
+      {label:"Diagnostic rules", kind:"bullets", kindClass:"rules", items:["Time it, visibly. Say the clock out loud once.","Do not correct mid-task — let the leak show itself.","One real example from their own specialty beats a generic one.", scaffold.correctionStyle]}
+    ]
+  });
+
+  const mode = modeFor(input);
+  if(matrix.length>1 && mode!==MODE.SPRINT){
+    const second = matrix[1];
+    phases.push({
+      kicker:"02b", clock:"0:28", minutes:8, title:`Secondary check — ${second.label}`,
+      sections:[
+        {label:"Task", kind:"prose", items:[second.task]},
+        {label:"Severity", kind:"prose", items:[`${second.sevInfo.text}. ${second.severity>=3 ? "Treat as a second presenting complaint, not background noise." : "Confirm it is maintenance-level and move on quickly."}`]}
+      ]
+    });
+  } else if(matrix.length>1 && mode===MODE.SPRINT){
+    phases.push({
+      kicker:"02b", clock:"0:28", minutes:2, title:"Secondary skill — deliberately not tested today",
+      sections:[
+        {label:"Ruthless prioritisation", kind:"prose", items:[`With ${weeksFor(input.timeline)} week(s) to the exam, only the single weakest skill (${matrix[0].label}) is developed in this programme. ${matrix[1].label} is noted but not actioned — there is not enough time to move two skills before the date.`]}
+      ]
+    });
+  }
+
+  const g = pickGrammarFor(input, 0);
+  const p = pickPronunciationFor(input, 0);
+  phases.push({
+    kicker:"03", clock: matrix.length>1 ? "0:36" : "0:28", minutes:10, title:"Name the leak, teach the smallest fix",
+    sections:[
+      {label:"Feedback frame", kind:"quotes", items:["Here's what's strong — and here's the one thing that's costing you the most marks right now."]},
+      {label:"Grammar micro-component selected", kind:"prose", items:[`${g.id} — ${g.title}. ${g.explanation} Example: "${g.example}" Common slip: "${g.mistake}"`]},
+      {label:"Pronunciation micro-component selected", kind:"prose", items:[`${p.id} — ${p.title}. ${p.explanation} Target words: ${p.words}`]},
+      {label:"Teach", kind:"bullets", items:[`Introduce ${scaffold.newItemsPerLesson} new language item(s) max this session — not more.`,"Make them produce the corrected version themselves before you confirm it."]}
+    ]
+  });
+
+  if(LEVEL_PROFILE[input.level].raisedCeiling && mode!==MODE.SPRINT){
+    phases.push({
+      kicker:"03b", clock:"0:38", minutes:6, title:"Raise the ceiling — higher-order check",
+      sections:[
+        {label:"Why this phase exists", kind:"prose", items:["Fluent enough to mask real gaps. Do not let this trial end on basic accuracy — probe nuance directly."]},
+        {label:"Try one of these", kind:"bullets", items:RAISED_CEILING.rolePlayScenarios.slice(0,2)},
+        {label:"Feedback dimensions to use", kind:"bullets", items:RAISED_CEILING.feedbackDimensions}
+      ]
+    });
+  }
+
+  phases.push({
+    kicker:"04", clock:"0:46", minutes:4, title:"Diagnostic hypothesis and pathway",
+    sections:[
+      {label:"Diagnostic hypothesis", kind:"prose", items:[diagnosticHypothesis(input)]}
+    ]
+  });
+
+  phases.push({
+    kicker:"05", clock:"0:50", minutes:0, title:"Close",
+    sections:[
+      {label:"Close script", kind:"quotes", items:["So here's what I'd suggest for a programme, based on what I just saw — can I walk you through it?"]}
+    ]
+  });
+
+  return phases;
+}
+function tutorScriptTitle(input){
+  const mode = modeFor(input);
+  return `Trial diagnostic — ${input.duration} minutes · ${MODE_META[mode].label} candidate`;
+}
+function generateTrial(input){
+  const dir = programDirection(input);
+  return {
+    input,
+    mode: dir.mode, modeMeta: dir.meta,
+    profileLine: `${input.studentName.trim()? input.studentName.trim()+" · ":""}${PROFESSION_LABEL[input.profession]} · ${LEVEL_LABEL[input.level]} · ${GOAL_LABEL[input.goal]} · lead skill: ${SKILL_LABEL[input.skills[0]||"speaking"]}`,
+    diagnosticFocus: diagnosticHypothesis(input),
+    programDirection: dir.rationale,
+    matrix: buildTrialMatrix(input),
+    offer: offerFor(input),
+    tutorScript:{ title: tutorScriptTitle(input), kicker: `${PROFESSION_LABEL[input.profession]} · ${LEVEL_LABEL[input.level]} · ${GOAL_LABEL[input.goal]}`, phases: buildPhases(input) }
+  };
+}
+
+/* ---------------------------------------------------------------------
+   9. PROGRAMME BUILDER — week-by-week, mode-differentiated
+   --------------------------------------------------------------------- */
+function weekTitlesFor(input, mode, lead, count){
+  const track = goalTrackFor(input);
+  const roleplay = PROFESSION_ROLEPLAY[input.profession];
+  if(mode===MODE.SPRINT){
+    // ruthless: short, urgent, action-oriented titles — almost entirely lead-skill
+    const base = {
+      reading:["Reading Baseline – Clock Starts Now","Scan Fast, Trust Nothing – Exception Traps","Zero-Miss Negatives – Drill","Part B – Evidence Under 90 Seconds","Part C – Inference, No Second Read","Full Mock – Timed, No Pauses","Error Drill – Weak Points Only","Final Mock – Exam Conditions","Survival Speaking – Safety Language Only","Exam Run – Full Timed, No Notes"],
+      writing:["Writing Baseline – Clock Starts Now","Purpose in Sentence One – Drill","Cut the Noise – Selection Only, No Extras","Letter Rep 1 – Timed, No Do-Overs","Letter Rep 2 – Timed, Faster","Error Drill – Weak Points Only","Full Mock – 12 Minutes, No Pauses","Final Letter – Submission Ready","Survival Speaking – Safety Language Only","Exam Run – Full Timed, No Notes"],
+      speaking:["Speaking Baseline – Under Pressure, No Warm-Up","ICE – Ask It, Use It, No Skipping","Role-Play – High-Stakes, Timed","Rapport – Under the Clock","Full Mock – Timed, No Restarts","Error Drill – Weak Points Only","Final Mock – Exam Conditions","Survival Grammar – Costliest Errors Only","Exam Run – Full Timed, No Notes"],
+      listening:["Listening Baseline – One Pass Only","Note-Taking Rebuild – Fast, No Rewriting","Part A – Detail, Timed","Part B – Distractor Drill","Part C – Inference, One Listen","Full Mock – Timed, No Replay","Error Drill – Weak Points Only","Exam Run – Full Timed, No Notes"]
+    };
+    const list = base[lead] || base.speaking;
+    return Array.from({length:count}, (_,i)=> list[i % list.length]);
+  }
+  if(mode===MODE.INTENSIVE){
+    const list = ["Diagnostic review + primary-skill baseline","Primary skill — structured drill 1 + secondary maintenance","Primary skill — structured drill 2 + secondary maintenance","Primary skill — timed practice under pressure","Half mock (primary skill) + targeted error review","Primary skill — final tightening + secondary check","Full timed mock","Review, weak-point repeat, exam-day logistics"];
+    return Array.from({length:count}, (_,i)=> list[i % list.length]);
+  }
+  if(mode===MODE.STANDARD){
+    const list = track==="conversational"
+      ? ["Placement & rapport","Grammar — tense on the clinical timeline","Core vocabulary — ward & specialty language","Conversation — real cases from their week","Grammar — question formation & hedging","Conversation — explaining to patients","Pronunciation — word stress & chunking","Review & consolidate"]
+      : ["Placement & diagnostic review","Foundational grammar for the clinical timeline","Reading — scanning & evidence location","Pronunciation foundations","Speaking — ICE & rapport","Writing — purpose & structure","Full timed mock","Review & final polish"];
+    return Array.from({length:count}, (_,i)=> list[i % list.length]);
+  }
+  // sustainable
+  const list = track==="conversational"
+    ? ["Placement & rapport","Grammar — clinical timeline","Ward vocabulary in context","Real-case conversation","Grammar — hedging & nuance","Explaining to patients & families","Pronunciation — stress & chunking","Review & consolidate, set next cycle"]
+    : ["Placement & long-view goal setting","Grammar foundations, paced","Reading — building speed gradually","Speaking — rapport & structure","Pronunciation — sound by sound","Writing foundations","Light review mock","Review & consolidate, set next cycle"];
+  return Array.from({length:count}, (_,i)=> list[i % list.length]);
+}
+function riskNoteFor(input, mode, weekIdx, totalWeeks){
+  if(mode===MODE.SPRINT){
+    if(weekIdx===0) return "Baseline session — if the diagnostic hypothesis from the trial doesn't hold up here, the whole sprint plan needs re-targeting immediately. No time to discover this in week 2.";
+    if(weekIdx===totalWeeks-1) return "Final session before the exam — do not introduce anything new here. Confidence calibration only.";
+    if(weekIdx>=totalWeeks-3) return "Late-stage sprint — if error rate hasn't dropped by now, escalate to the student: they need more independent practice hours, not more tutor time.";
+    return "On-track check: this only works if homework is actually being done. Confirm compliance before session, not during.";
+  }
+  if(mode===MODE.INTENSIVE && weekIdx>=totalWeeks-2) return "Approaching the mock — flag any skill still below target now, not after the mock.";
+  return null;
+}
+function studentWeekLineFor(input, weekIdx, g, unit){
+  const u = (unit||"week").toLowerCase();
+  const lead = input.skills[0] || "speaking";
+  const map = {
+    reading:`By the end of this ${u} you should be able to find the key answer in a passage faster than before.`,
+    writing:`By the end of this ${u} your opening sentence should clearly tell the reader what the letter is for.`,
+    speaking:`By the end of this ${u} you should be able to get through this scenario without losing your train of thought.`,
+    listening:`By the end of this ${u} you should catch the key details on your first listen.`,
+    grammar:`By the end of this ${u}, ${g.title.toLowerCase()} should feel natural in your own examples, not just the practice ones.`,
+    vocabulary:`By the end of this ${u} you should be able to switch between the clinical and everyday version of the key words without pausing.`,
+    pronunciation:`By the end of this ${u} the target sounds should be clear on your first try, not just after a correction.`
+  };
+  return map[lead] || map.speaking;
+}
+function studentSummaryFor(input, mode, weeks){
+  const lead = SKILL_LABEL[input.skills[0] || "speaking"].toLowerCase();
+  const goal = GOAL_LABEL[input.goal];
+  if(mode===MODE.SPRINT) return `You have ${weeks} week${weeks===1?'':'s'} until your exam, so this plan is focused and deliberate. We will spend almost all of our time on ${lead}, because that is where the most marks are. Each session is short, clear, and practical, and the homework is brief but repeated so it becomes automatic. You do not need to do everything, only the right things.`;
+  if(mode===MODE.INTENSIVE) return `You have ${weeks} weeks to prepare for ${goal}. We will keep ${lead} at the centre of every session, with a little time each week to keep your other skills steady. The pace is steady and the plan is designed to be manageable alongside your work.`;
+  if(mode===MODE.STANDARD) return `This plan builds your skills step by step towards ${goal}. We will work carefully on the foundations first, then move into exam-style practice, with a full practice test as you get closer. There is time to do this properly.`;
+  return input.goal==="conversational"
+    ? `This is a relaxed, ongoing plan to help you speak English more confidently in your real clinical work. We will build grammar and useful medical language together, using real situations from your week. There is no exam pressure, only steady progress.`
+    : `This is a steady, long-term plan towards ${goal}. We will build your skills gradually and review regularly, so what you learn stays with you.`;
+}
+function buildProgram(input){
+  const dir = programDirection(input);
+  const scaffold = scaffoldProfile(input);
+  const mode = dir.mode;
+  const lead = input.skills[0] || "speaking";
+  const wCount = mode===MODE.SPRINT ? Math.min(dir.weeks*MODE_META.sprint.sessionsPerWeek, 12)
+    : mode===MODE.INTENSIVE ? Math.min(dir.weeks*MODE_META.intensive.sessionsPerWeek, 12)
+    : 8;
+  const titles = weekTitlesFor(input, mode, lead, wCount);
+  const weeksArr = titles.map((title, i)=>{
+    const g = pickGrammarFor(input, i);
+    const p = pickPronunciationFor(input, i);
+    return {
+      n:i+1, title,
+      track: mode===MODE.SPRINT ? "Sprint" : mode===MODE.INTENSIVE ? "Intensive" : (i===titles.length-1 ? "Review" : "Core"),
+      grammarCode: g.id, grammarTitle: g.title,
+      pronCode: p.id, pronTitle: p.title,
+      homeworkMinutes: scaffold.homeworkMinutes,
+      homeworkTasks: scaffold.homeworkTasks,
+      newItems: scaffold.newItemsPerLesson,
+      riskNote: riskNoteFor(input, mode, i, titles.length),
+      studentSuccessLine: studentWeekLineFor(input, i, g, mode===MODE.SPRINT ? 'session' : 'week')
+    };
+  });
+  return {
+    input, mode, modeMeta: MODE_META[mode], weeks: dir.weeks, rationale: dir.rationale, studentSummary: studentSummaryFor(input, mode, dir.weeks), cutNotice: dir.cutNotice,
+    scaffold, weeksArr, roleplay: PROFESSION_ROLEPLAY[input.profession],
+    levelProfile: LEVEL_PROFILE[input.level],
+    unitLabel: mode===MODE.SPRINT ? "Session" : "Week"
+  };
+}
+
+/* ---------------------------------------------------------------------
+   10. LESSON SCRIPT ALGORITHM
+   --------------------------------------------------------------------- */
+function buildLessonScript(input, weekIdx){
+  const program = buildProgram(input);
+  const week = program.weeksArr[weekIdx] || program.weeksArr[0];
+  const scaffold = program.scaffold;
+  const g = pickGrammarFor(input, weekIdx);
+  const p = pickPronunciationFor(input, weekIdx);
+  const roleplay = program.roleplay;
+  const levelProfile = program.levelProfile;
+  const duration = input.duration || 50;
+
+  const caseBank = {
+    surgeon:"A 58-year-old patient is 2 days post-laparoscopic cholecystectomy with new-onset fever 38.4°C and increasing RUQ pain.",
+    gp:"A 45-year-old presents with a 3-day history of worsening sore throat, difficulty swallowing, and a low-grade fever.",
+    nurse:"A patient due for discharge tomorrow needs education on a new anticoagulant, including missed-dose instructions and bleeding warning signs.",
+    midwife:"A 32-year-old at 38 weeks wants to discuss her birth preferences, including pain relief options and her partner's role.",
+    paramedic:"You arrive at a scene: a 70-year-old with sudden-onset chest pain radiating to the left arm, diaphoretic, BP 100/60.",
+    "med-student":"You are asked to present a case in the morning ward round: a patient admitted overnight with acute abdominal pain.",
+    resident:"You are the only doctor covering the ward overnight; a patient's oxygen saturations are dropping and the family is asking what it means.",
+    specialist:"A referring GP wants a plain-language explanation of an abnormal MRI finding for their patient.",
+    vet:"A dog owner is waiting to hear results of bloodwork suggesting early kidney disease in their 9-year-old dog.",
+    allied:"A patient needs step-by-step instructions for a new home exercise programme after a knee injury.",
+    other:"Adapt: build a short case relevant to the workplace context this student has described."
+  };
+  let patientCase = caseBank[input.profession] || caseBank.gp;
+  let caseIsRaised = false;
+  let namedCase = null;
+  if(roleplay.cases && roleplay.cases.length){
+    namedCase = roleplay.cases[weekIdx % roleplay.cases.length];
+    patientCase = `${namedCase.name}, ${namedCase.age}. ${namedCase.background} Presenting complaint: ${namedCase.complaint}`;
+  }
+  if(levelProfile.raisedCeiling && modeFor(input)!==MODE.SPRINT){
+    patientCase = ((RAISED_CEILING.byProfession[input.profession] || []).concat(RAISED_CEILING.rolePlayScenarios))[weekIdx % ((RAISED_CEILING.byProfession[input.profession] || []).length + RAISED_CEILING.rolePlayScenarios.length)] + (namedCase ? ` (Use ${namedCase.name} as the patient, with this added complexity layered on top.)` : ` (Context: ${caseBank[input.profession] || caseBank.gp})`);
+    caseIsRaised = true;
+  }
+
+  return {
+    week, input, duration, unitLabel: program.unitLabel,
+    warmup: { minutes: Math.round(duration*0.1), content: `Quick check-in on homework from last session (set last time: ${week.homeworkTasks}). ${scaffold.tone}` },
+    grammarBlock: { minutes: Math.round(duration*0.2), code:g.id, title:g.title, explanation:g.explanation, example:g.example, mistake:g.mistake, teachingNote: `Introduce as the session's language target — max ${scaffold.newItemsPerLesson} new item(s). ${scaffold.correctionStyle}` },
+    pronBlock: { minutes: Math.round(duration*0.12), code:p.id, title:p.title, explanation:p.explanation, words:p.words },
+    caseWork: { minutes: Math.round(duration*0.38), title: caseIsRaised ? `Higher-order scenario — ${PROFESSION_LABEL[input.profession]}` : `Patient case — ${PROFESSION_LABEL[input.profession]}`, case: patientCase, hiddenConcern: namedCase ? namedCase.hiddenConcern : null, successCriteria: (namedCase ? namedCase.success + " " : "") + (caseIsRaised ? roleplay.successCriteria + " Plus: appropriacy and impact, not only accuracy — did the register fit, did the message land?" : roleplay.successCriteria), scaffoldingNote: levelProfile.scaffolding },
+    exitCheck: { minutes: Math.round(duration*0.1), items:[`Can the student reproduce ${g.id} correctly without a prompt?`,`Can the student self-correct the target ${p.id} sound/pattern when flagged?`, "One-sentence summary from the student: what changed today?"] },
+    homework: { minutes: week.homeworkMinutes, tasks: week.homeworkTasks, description: homeworkDescriptionFor(input, week, g, 'tutor') },
+    successLine: successLineFor(input, week, g),
+    frames: framesFor(input)
+  };
+}
+function successLineFor(input, week, g){
+  const lead = input.skills[0] || "speaking";
+  const map = {
+    reading:`You can scan the passage type we practised and find the answer inside the time limit.`,
+    writing:`Your opening line clearly states the purpose — a reader would know why they're reading in the first sentence.`,
+    speaking:`You can complete the role-play we practised without losing the thread under gentle pressure.`,
+    listening:`You can catch the key details on a first listen, without needing a second pass.`,
+    grammar:`You can use ${g.title.toLowerCase()} correctly in your own real example, not just the practice sentence.`,
+    vocabulary:`You can switch between the clinical and plain-language version of today's key terms without pausing.`,
+    pronunciation:`Your pronunciation of today's target sounds is clear on the first attempt, not just after correction.`
+  };
+  return map[lead] || map.speaking;
+}
+function homeworkDescriptionFor(input, week, g, audience){
+  // audience: 'student' (default, calm, NO internal codes) or 'tutor' (may cite the grammar code)
+  const track = goalTrackFor(input);
+  const ref = audience==='tutor' ? g.id+' ('+g.title+')' : 'today\'s language pattern ('+g.title.toLowerCase()+')';
+  const n = String(week.homeworkTasks);
+  if(/drill/.test(n)) return `${n}, done every day until our next session. Keep each one short and do it the same way each time, so it becomes automatic. Focus: ${ref}.`;
+  if(track==="oet") return `${n} short timed practice item(s) in your exam skill, plus 5 minutes revisiting ${ref} using a real extract from your work.`;
+  if(track==="conversational") return `${n} short reflection or vocabulary task(s) linked to a real case from your week. Keep it light and low-pressure; you can do it without a desk.`;
+  return `${n} task(s) practising ${ref} and this week's vocabulary in a real workplace situation.`;
+}
+
+/* ---------------------------------------------------------------------
+   11. STUDENT WORKSHEET ALGORITHM
+   --------------------------------------------------------------------- */
+function buildWorksheet(input, weekIdx){
+  const program = buildProgram(input);
+  const week = program.weeksArr[weekIdx] || program.weeksArr[0];
+  const g = pickGrammarFor(input, weekIdx);
+  const p = pickPronunciationFor(input, weekIdx);
+  const levelProfile = LEVEL_PROFILE[input.level];
+  const scaffoldHeavy = ["a2","b1-low"].includes(input.level);
+  return {
+    input, week, title: week.title, unitLabel: program.unitLabel,
+    focus: `${g.title} + ${p.title}`,
+    successLine: week.studentSuccessLine,
+    frames: framesFor(input),
+    languageBlock: { heading: scaffoldHeavy ? "1. Language — fill in the pattern" : "1. Language", content: g.example, frame: scaffoldHeavy ? g.example.replace(/[A-Za-z][a-zA-Z\s]{2,}/,'______________') : null },
+    practiceBlock: { heading: "2. Practice", content: practiceInstructionFor(input) },
+    homeworkBlock: { heading: `3. Homework — ${week.homeworkMinutes} minutes`, content: homeworkDescriptionFor(input, week, g) },
+    scaffoldNote: scaffoldHeavy ? "This worksheet uses sentence frames and word banks — fill in the blanks rather than writing freely." : null
+  };
+}
+function practiceInstructionFor(input){
+  const lead = input.skills[0] || "speaking";
+  const map = {
+    reading:"Skim the extract in 90 seconds. Underline every negative word (not, except, unless, without) before you read for detail.",
+    writing:"Write the first sentence of your letter only. Check: does it state the purpose clearly?",
+    speaking:"Practise the role-play phrase three times, then say it without looking at the page.",
+    listening:"Listen once for the general idea, then again for the specific numbers or details.",
+    grammar:"Complete three sentences using today's pattern, using your own real clinical examples.",
+    vocabulary:"Say each word in both its clinical form and the plain-language version you'd use with a patient.",
+    pronunciation:"Record yourself saying the target words, then compare to the model."
+  };
+  return map[lead] || map.speaking;
+}
+
+/* =====================================================================
+   RENDERING
+   ===================================================================== */
+let lastTrialPack = null;
+let lastProgramPack = null;
+let currentStudentKey = null;
+let currentWeekIdx = 0;
+
+function modeBadge(mode){
+  const m = MODE_META[mode];
+  return `<span class="badge ${m.badgeClass}">${m.label}</span>`;
+}
+
+// ---------- trial output ----------
+function renderTrialOutput(pack){
+  lastTrialPack = pack;
+  const s = pack.tutorScript;
+  document.getElementById('trialTitle').textContent = s.title;
+  document.getElementById('trialKicker').textContent = s.kicker;
+  document.getElementById('trialStudent').textContent = pack.input.studentName || '';
+  document.getElementById('trialStudent').style.display = pack.input.studentName ? 'block' : 'none';
+  document.getElementById('trialBadges').innerHTML = modeBadge(pack.mode) + `<span class="badge neutral">${LEVEL_LABEL[pack.input.level]}</span><span class="badge neutral">${pack.input.accent==='strong'?'Strong accent focus':'Standard accent handling'}</span>`;
+  document.getElementById('trialProfile').textContent = pack.profileLine;
+  document.getElementById('trialFocus').textContent = pack.diagnosticFocus;
+  document.getElementById('trialDirection').textContent = pack.programDirection;
+  document.getElementById('offerName').textContent = pack.offer.name;
+  document.getElementById('offerCadence').textContent = pack.offer.cadence;
+  document.getElementById('offerClose').textContent = pack.offer.close;
+
+  document.getElementById('trialMatrix').innerHTML = pack.matrix.map(row => `
+    <div class="diag-row">
+      <div class="dtop"><span class="dskill">${row.label}</span><span class="dscore ${row.sevInfo.cls}">${row.sevInfo.text}</span></div>
+      <div class="dbody"><b>Task:</b> ${row.task}<br><b>Watch:</b> ${row.watch.join(' · ')}${row.observableCriteria ? `<br><b>Observable criteria:</b> ${row.observableCriteria.join(' · ')}` : ''}</div>
+    </div>`).join('');
+
+  const container = document.getElementById('trialPhases');
+  container.innerHTML = s.phases.map(phase=>{
+    const secHtml = phase.sections.map(sec=>{
+      let body='';
+      if(sec.kind==='quotes') body = sec.items.map(t=>`<p class="quote">&ldquo;${t}&rdquo;</p>`).join('');
+      else if(sec.kind==='prose') body = sec.items.map(t=>`<p class="prose">${t}</p>`).join('');
+      else body = `<ul>${sec.items.map(t=>`<li>${t}</li>`).join('')}</ul>`;
+      const labelClass = sec.kindClass==='rules' ? 'rules' : '';
+      return `<div class="sec"><div class="slabel ${labelClass}">${sec.label}</div>${body}</div>`;
+    }).join('');
+    return `<div class="phase">
+      <div class="pk">${phase.kicker} · ${phase.clock} · ${phase.minutes} min</div>
+      <h2>${phase.title}</h2>
+      ${secHtml}
+    </div>`;
+  }).join('');
+}
+
+// ---------- program output ----------
+function renderProgram(pack){
+  lastProgramPack = pack;
+  document.getElementById('progTitle').textContent = `${pack.input.studentName} — ${GOAL_LABEL[pack.input.goal]}`;
+  document.getElementById('progSub').textContent = pack.mode===MODE.SPRINT
+    ? `${PROFESSION_LABEL[pack.input.profession]} · ${LEVEL_LABEL[pack.input.level]} · ${pack.weeks}-week emergency plan to the exam date`
+    : `${PROFESSION_LABEL[pack.input.profession]} · ${LEVEL_LABEL[pack.input.level]} · ${DEADLINE_LABEL[pack.input.timeline]}`;
+  document.getElementById('progBadges').innerHTML = modeBadge(pack.mode) + `<span class="badge neutral">${pack.modeMeta.sessionsPerWeek} session(s)/week</span><span class="badge neutral">homework: ${pack.scaffold.homeworkTasks}</span>`;
+  document.getElementById('progDirection').textContent = pack.rationale;
+  document.getElementById('progUrgency').textContent = `${pack.weeks} week(s) to target · ${pack.modeMeta.description}`;
+  document.getElementById('progRules').innerHTML = `
+    ${pack.cutNotice ? `<div style="margin-bottom:12px;padding:10px 12px;background:var(--critical-soft);border-radius:8px;color:var(--critical);font-size:13px"><b>Cut notice:</b> ${pack.cutNotice}</div>` : ''}
+    <b>Tone:</b> ${pack.scaffold.tone}<br>
+    <b>Correction style:</b> ${pack.scaffold.correctionStyle}<br>
+    <b>New items per lesson:</b> ${pack.scaffold.newItemsPerLesson}<br>
+    <b>Homework:</b> ${pack.scaffold.homeworkTasks} (~${pack.scaffold.homeworkMinutes} min/week)<br>
+    <b>Level scaffolding (${LEVEL_LABEL[pack.input.level]}):</b> ${pack.levelProfile.scaffolding}<br>
+    <b>Ceiling to respect:</b> ${pack.levelProfile.ceiling}<br>
+    <b>Profession role-play bank:</b> ${pack.roleplay.bank}<br>
+    <b>Success criteria:</b> ${pack.roleplay.successCriteria}`;
+  document.getElementById('progWeeks').innerHTML = `<p style="font-size:11px;color:var(--faint);margin-bottom:8px">${pack.unitLabel==='Session' ? 'Numbered by session, not calendar week — ' + pack.modeMeta.sessionsPerWeek + ' sessions/week toward the exam date.' : 'Numbered by week.'}</p>` + pack.weeksArr.map(w=>`
+    <div class="week-row">
+      <div class="week-row-top">
+        <div class="week-num">${String(w.n).padStart(2,'0')}</div>
+        <div><div class="week-title">${w.title}</div><div class="week-track">${w.track}</div></div>
+        <div class="week-meta">${w.homeworkTasks} HW</div>
+      </div>
+      <div class="week-detail"><span class="wd-label">Grammar:</span> <span class="code-chip">${w.grammarCode}</span>${w.grammarTitle} &nbsp; <span class="wd-label">Pron:</span> <span class="code-chip">${w.pronCode}</span>${w.pronTitle}</div>
+      ${w.riskNote ? `<div class="week-detail" style="color:var(--critical);font-style:italic">Risk: ${w.riskNote}</div>` : ''}
+      <div class="week-detail" style="color:var(--faint)">Student sees: "${w.studentSuccessLine}"</div>
+    </div>`).join('');
+}
+
+// ---------- lesson script output ----------
+function renderLessonWeekPicker(input){
+  const program = buildProgram(input);
+  const picker = document.getElementById('lessonWeekPicker');
+  picker.innerHTML = program.weeksArr.map((w,i)=>`<div class="opt ${i===currentWeekIdx?'sel':''}" onclick="selectLessonWeek(${i})"><div class="olabel">Wk ${w.n}</div></div>`).join('');
+}
+function selectLessonWeek(i){
+  currentWeekIdx = i;
+  const input = SAMPLE_TRIALS[currentStudentKey];
+  renderLessonWeekPicker(input);
+  renderLessonOutput(input, i);
+}
+function renderLessonOutput(input, weekIdx){
+  const script = buildLessonScript(input, weekIdx);
+  document.getElementById('lessonOutput').innerHTML = `
+    <div class="doc-top" style="margin-top:24px">
+      <p class="kicker">Session script</p>
+      <h1 style="font-size:1.6rem">${input.studentName} — ${script.unitLabel} ${script.week.n}: ${script.week.title}</h1>
+      <p class="sub">${script.duration} minutes · ${PROFESSION_LABEL[input.profession]} · ${LEVEL_LABEL[input.level]}</p>
+    </div>
+    <div class="phase" style="margin-top:20px;padding-top:0;border-top:none">
+      <div class="pk">01 · ${script.warmup.minutes} min</div><h2 style="font-size:1.2rem">Warm-up &amp; homework check</h2>
+      <div class="sec"><p class="prose">${script.warmup.content}</p></div>
+    </div>
+    <div class="phase">
+      <div class="pk">02 · ${script.grammarBlock.minutes} min</div><h2 style="font-size:1.2rem">Grammar micro-component <span class="code-chip">${script.grammarBlock.code}</span></h2>
+      <div class="sec"><div class="slabel">${script.grammarBlock.title}</div><p class="prose">${script.grammarBlock.explanation}</p><p class="quote">${script.grammarBlock.example}</p><div class="slabel risk">Common mistake</div><p class="prose">${script.grammarBlock.mistake}</p><div class="slabel rules">Teaching note</div><p class="prose">${script.grammarBlock.teachingNote}</p></div>
+    </div>
+    <div class="phase">
+      <div class="pk">03 · ${script.pronBlock.minutes} min</div><h2 style="font-size:1.2rem">Pronunciation micro-component <span class="code-chip">${script.pronBlock.code}</span></h2>
+      <div class="sec"><div class="slabel">${script.pronBlock.title}</div><p class="prose">${script.pronBlock.explanation}</p><p class="quote">${script.pronBlock.words}</p></div>
+    </div>
+    <div class="phase">
+      <div class="pk">04 · ${script.caseWork.minutes} min</div><h2 style="font-size:1.2rem">${script.caseWork.title}</h2>
+      <div class="sec"><p class="prose">${script.caseWork.case}</p>${script.caseWork.hiddenConcern ? `<div class="slabel risk">Hidden concern (tutor-only — do not reveal upfront)</div><p class="prose">${script.caseWork.hiddenConcern}</p>` : ''}<div class="slabel">Success criteria</div><p class="prose">${script.caseWork.successCriteria}</p><div class="slabel rules">Scaffolding for this level</div><p class="prose">${script.caseWork.scaffoldingNote}</p></div>
+    </div>
+    ${script.frames.length ? `<div class="phase">
+      <div class="pk">Support · frames to give the student</div><h2 style="font-size:1.2rem">Ready-made language frames</h2>
+      <div class="sec"><p class="prose">Put these on the screen or page before the case work. Let the student fill the gaps rather than build sentences from nothing. Fade them out as confidence grows.</p><ul>${script.frames.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+    </div>` : ''}
+    <div class="phase">
+      <div class="pk">05 · ${script.exitCheck.minutes} min</div><h2 style="font-size:1.2rem">Exit check</h2>
+      <div class="sec"><ul>${script.exitCheck.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+    </div>
+    <div class="phase">
+      <div class="pk">Homework · ~${script.homework.minutes} min</div><h2 style="font-size:1.2rem">Set for next session</h2>
+      <div class="sec"><p class="prose">${script.homework.description}</p></div>
+    </div>`;
+  document.getElementById('lessonDownloadBar').innerHTML = `<button class="btn primary" onclick="downloadLessonPdf()">Download tutor lesson-script PDF</button>`;
+  window._currentLessonScript = script;
+}
+
+// ---------- worksheet output ----------
+function renderWorksheetOutput(input, weekIdx){
+  const ws = buildWorksheet(input, weekIdx);
+  window._currentWorksheet = ws;
+  document.getElementById('worksheetOutput').innerHTML = `
+    <div class="doc-top" style="margin-top:20px">
+      <h1 style="font-size:1.6rem">${input.studentName}'s worksheet — ${ws.unitLabel} ${ws.week.n}</h1>
+      <p class="sub">${ws.title}</p>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="blocklabel">This week's focus</div>
+      <div class="blockbody">${ws.focus}</div>
+    </div>
+    <div class="card" style="margin-top:14px;background:var(--accent-soft);border-color:var(--accent)">
+      <div class="blocklabel" style="color:var(--accent)">What success looks like this week</div>
+      <div class="blockbody">${ws.successLine}</div>
+    </div>
+    <div class="ws-item">
+      <h3>${ws.languageBlock.heading}</h3>
+      <p>${ws.languageBlock.frame ? ws.languageBlock.frame : ws.languageBlock.content}</p>
+    </div>
+    <div class="ws-item">
+      <h3>${ws.practiceBlock.heading}</h3>
+      <p>${ws.practiceBlock.content}</p>
+    </div>
+    ${ws.frames.length ? `<div class="ws-item">
+      <h3>Sentence starters to help you</h3>
+      <p>Use these to get going. Fill in the gaps with your own words.</p>
+      <ul style="margin:8px 0 0;padding-left:20px;font-size:13.5px;line-height:1.7;color:var(--ink-soft)">${ws.frames.map(f=>`<li>${f}</li>`).join('')}</ul>
+    </div>` : ''}
+    <div class="ws-item">
+      <h3>${ws.homeworkBlock.heading}</h3>
+      <p>${ws.homeworkBlock.content}</p>
+    </div>
+    ${ws.scaffoldNote ? `<p style="margin-top:10px;font-size:12px;color:var(--faint);font-style:italic">${ws.scaffoldNote}</p>` : ''}`;
+}
+
+/* =====================================================================
+   TRIAL WIZARD (unchanged interaction, elevated content)
+   ===================================================================== */
+const STEPS = ["Name & time","Profession","Level","Skills","Goal","Intelligibility","Timeline","Capacity"];
+let wiz = {step:0, input:{...empty}};
+
+function renderStepper(){
+  const s = document.getElementById('stepper');
+  s.innerHTML = STEPS.map((_,i)=>`<div class="dot ${i<=wiz.step?'done':''}"></div>`).join('');
+  document.getElementById('stepLabel').textContent = `Step ${wiz.step+1} of ${STEPS.length} · ${STEPS[wiz.step]}`;
+}
+function optionHTML(id, current, label, hint){
+  const sel = current===id ? 'sel' : '';
+  return `<div class="opt ${sel}" data-id="${id}" onclick="pickOpt('${id}')"><div class="olabel">${label}</div>${hint?`<div class="ohint">${hint}</div>`:''}</div>`;
+}
+function optionHTMLMulti(id, arr, label){
+  const sel = arr.includes(id) ? 'sel' : '';
+  return `<div class="opt ${sel}" data-id="${id}" onclick="pickOptMulti('${id}')"><div class="olabel">${label}</div></div>`;
+}
+function renderStep(){
+  renderStepper();
+  const body = document.getElementById('stepBody');
+  const i = wiz.input;
+  let html = '';
+  if(wiz.step===0){
+    html += `<label class="field-label">Student name (optional)</label>
+      <input class="textin" id="nameInput" placeholder="e.g. Aglailton" value="${i.studentName}">
+      <label class="field-label">How long is the trial?</label>
+      <div class="opt-grid">${optionHTML('25', String(i.duration), '25 minutes')}${optionHTML('50', String(i.duration), '50 minutes')}</div>`;
+  } else if(wiz.step===1){
+    html += `<h2 style="font-size:1.2rem;font-weight:500;margin-bottom:4px">Who is sitting in front of you?</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Profession decides the role-play bank and how you name the gap.</p>
+      <div class="opt-grid">${Object.keys(PROFESSION_LABEL).map(id=>optionHTML(id,i.profession,PROFESSION_LABEL[id],PROFESSION_HINT[id])).join('')}</div>`;
+  } else if(wiz.step===2){
+    html += `<h2 style="font-size:1.2rem;font-weight:500;margin-bottom:4px">English level</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Level sets pace, scaffolding, and the ceiling of what you should attempt today.</p>
+      <div class="opt-grid wide">${Object.keys(LEVEL_LABEL).map(id=>optionHTML(id,i.level,LEVEL_LABEL[id],LEVEL_HINT[id])).join('')}</div>`;
+  } else if(wiz.step===3){
+    html += `<h2 style="font-size:1.2rem;font-weight:500;margin-bottom:4px">Which skills need work?</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Select every real weakness. The first still leads the diagnostic.</p>
+      <div class="opt-grid">${Object.keys(SKILL_LABEL).map(id=>optionHTMLMulti(id,i.skills,SKILL_LABEL[id])).join('')}</div>`;
+  } else if(wiz.step===4){
+    html += `<h2 style="font-size:1.2rem;font-weight:500;margin-bottom:4px">The real destination</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Conversational Medical English is a different machine from OET.</p>
+      <div class="opt-grid wide">${Object.keys(GOAL_LABEL).map(id=>optionHTML(id,i.goal,GOAL_LABEL[id],GOAL_HINT[id])).join('')}</div>`;
+  } else if(wiz.step===5){
+    html += `<h2 style="font-size:1.2rem;font-weight:500;margin-bottom:4px">Intelligibility under pressure</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Accent is not a moral fact. It decides whether the mini-teach is a targeted drill.</p>
+      <div class="opt-grid wide">${Object.keys(ACCENT_LABEL).map(id=>optionHTML(id,i.accent,ACCENT_LABEL[id])).join('')}</div>`;
+  } else if(wiz.step===6){
+    html += `<h2 style="font-size:1.2rem;font-weight:500;margin-bottom:4px">Time until the exam or start date</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">≤4 weeks triggers Extreme Sprint mode. Scarcity must be true.</p>
+      <div class="opt-grid narrow">${Object.keys(DEADLINE_LABEL).map(id=>optionHTML(id,i.timeline,DEADLINE_LABEL[id])).join('')}</div>`;
+  } else if(wiz.step===7){
+    html += `<label class="field-label">Current confidence</label>
+      <div class="opt-grid narrow" style="margin-bottom:22px">${Object.keys(CONFIDENCE_LABEL).map(id=>optionHTML(id,i.confidence,CONFIDENCE_LABEL[id])).join('')}</div>
+      <label class="field-label">Homework capacity</label>
+      <div class="opt-grid">${Object.keys(HOMEWORK_LABEL).map(id=>optionHTML(id,i.homeworkCapacity,HOMEWORK_LABEL[id])).join('')}</div>`;
+  }
+  body.innerHTML = html;
+  if(wiz.step===0) document.getElementById('nameInput').addEventListener('input', e=>{ wiz.input.studentName = e.target.value; });
+  document.getElementById('backBtn').disabled = wiz.step===0;
+  document.getElementById('nextBtn').textContent = wiz.step===STEPS.length-1 ? "Write the script" : "Continue";
+  document.getElementById('nextBtn').disabled = wiz.step===3 && wiz.input.skills.length===0;
+}
+function pickOpt(id){
+  const i = wiz.input;
+  if(wiz.step===0) i.duration = Number(id);
+  if(wiz.step===1) i.profession = id;
+  if(wiz.step===2) i.level = id;
+  if(wiz.step===4) i.goal = id;
+  if(wiz.step===5) i.accent = id;
+  if(wiz.step===6) i.timeline = id;
+  if(wiz.step===7 && Object.keys(CONFIDENCE_LABEL).includes(id)) i.confidence = id;
+  if(wiz.step===7 && Object.keys(HOMEWORK_LABEL).includes(id)) i.homeworkCapacity = id;
+  renderStep();
+}
+function pickOptMulti(id){
+  const s = wiz.input.skills;
+  const idx = s.indexOf(id);
+  if(idx>-1) s.splice(idx,1); else s.push(id);
+  renderStep();
+}
+function wizStep(delta){ wiz.step = Math.max(0, Math.min(STEPS.length-1, wiz.step+delta)); renderStep(); }
+function wizNext(){
+  if(wiz.step < STEPS.length-1){ wizStep(1); return; }
+  currentStudentKey = null;
+  renderTrialOutput(generateTrial(wiz.input));
+  go('trial-output');
+}
+
+/* =====================================================================
+   PDF EXPORT — elite tier (jsPDF)
+   ===================================================================== */
+const PDF_INK=[22,24,20], PDF_MUTED=[106,108,100], PDF_ACCENT=[26,77,70], PDF_LINE=[221,214,200], PDF_BRONZE=[138,90,50];
+const PAGE_W=210, MARGIN=18, MAX_W=PAGE_W-MARGIN*2;
+/* jsPDF's built-in Helvetica only encodes WinAnsi. Any other character corrupts the WHOLE string
+   (wide letter-spacing, overflow). Normalise every string before it reaches doc.text/splitTextToSize. */
+function pdfSafe(t){
+  return String(t==null?'':t)
+    .replace(/\u2192/g,'>').replace(/\u2264/g,'<=').replace(/\u2265/g,'>=')
+    .replace(/\u2026/g,'...').replace(/\u2009|\u202f|\u00a0/g,' ')
+    .replace(/\u0283/g,'sh').replace(/\u03b8/g,'th').replace(/\u00f0/g,'dh')
+    .replace(/[\u2018\u2019]/g,"'").replace(/[\u201c\u201d]/g,'"')
+    .replace(/[^\x00-\xff\u2013\u2014\u2022]/g,'');
+}
+function newDoc(){
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'});
+  const _text=doc.text.bind(doc), _split=doc.splitTextToSize.bind(doc);
+  const clean=v=>Array.isArray(v)?v.map(pdfSafe):pdfSafe(v);
+  doc.text=(t,...a)=>_text(clean(t),...a);
+  doc.splitTextToSize=(t,...a)=>_split(pdfSafe(t),...a);
+  return doc;
+}
+function slug(s){ return (s||'student').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''); }
+function footer(doc, label){
+  const pages = doc.internal.getNumberOfPages();
+  for(let p=1;p<=pages;p++){
+    doc.setPage(p);
+    doc.setDrawColor(...PDF_LINE); doc.line(MARGIN,286,PAGE_W-MARGIN,286);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...PDF_MUTED);
+    doc.text('TheYasmineMed · '+label, MARGIN, 291);
+    doc.text(`${p} / ${pages}`, PAGE_W-MARGIN, 291, {align:'right'});
+  }
+}
+function pdfMasthead(doc, kicker, title, sub){
+  let y=20;
+  doc.setTextColor(...PDF_ACCENT); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+  doc.text(kicker.toUpperCase(), MARGIN, y); y+=7;
+  doc.setTextColor(...PDF_INK); doc.setFont('helvetica','bold'); doc.setFontSize(19);
+  const lines = doc.splitTextToSize(title, MAX_W); doc.text(lines, MARGIN, y); y += lines.length*7.5+2;
+  if(sub){ doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(...PDF_MUTED); doc.text(sub, MARGIN, y); y+=6; }
+  doc.setDrawColor(...PDF_ACCENT); doc.setLineWidth(0.6); doc.line(MARGIN, y, PAGE_W-MARGIN, y); doc.setLineWidth(0.2); y+=8;
+  return y;
+}
+function pdfLabel(doc,y,text,color){ doc.setTextColor(...(color||PDF_MUTED)); doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.text(text.toUpperCase(),MARGIN,y); return y+5; }
+function pdfBody(doc,y,text,opts={}){
+  doc.setTextColor(...PDF_INK); doc.setFont('helvetica', opts.italic?'italic':'normal'); doc.setFontSize(10.5);
+  const lines = doc.splitTextToSize(text, MAX_W-(opts.indent||0));
+  lines.forEach(line=>{ if(y>278){doc.addPage(); y=20;} doc.text(line, MARGIN+(opts.indent||0), y); y+=5.2; });
+  return y+2;
+}
+function pdfBullets(doc,y,items){
+  items.forEach(item=>{
+    if(y>278){doc.addPage(); y=20;}
+    doc.setTextColor(...PDF_INK); doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+    const lines = doc.splitTextToSize('•  '+item, MAX_W-3);
+    doc.text(lines, MARGIN, y); y+=lines.length*5.2;
+  });
+  return y+2;
+}
+function ensureSpace(doc,y,needed){ if(y+needed>278){ doc.addPage(); return 20; } return y; }
+function pdfChip(doc, x, y, text){
+  doc.setFillColor(239,234,224); const w = doc.getTextWidth(text)+6;
+  doc.roundedRect(x, y-3.5, w, 5.5, 1.2, 1.2, 'F');
+  doc.setTextColor(...PDF_INK); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.text(text, x+3, y);
+  return x+w+3;
+}
+
+function downloadTrialPdf(){
+  if(!lastTrialPack) return;
+  const pack = lastTrialPack, s = pack.tutorScript;
+  const doc = newDoc();
+  let y = pdfMasthead(doc, 'Private tutor script · internal use only', s.title, s.kicker);
+  if(pack.input.studentName){ doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...PDF_INK); doc.text(pack.input.studentName, MARGIN, y); y+=7; }
+
+  doc.setFillColor(...PDF_ACCENT); doc.roundedRect(MARGIN, y-4, doc.getTextWidth(MODE_META[pack.mode].label.toUpperCase())+8, 6.5, 1.5, 1.5, 'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+  doc.text(MODE_META[pack.mode].label.toUpperCase(), MARGIN+4, y);
+  y += 10;
+
+  y = pdfLabel(doc,y,'Profile'); y = pdfBody(doc,y,pack.profileLine);
+  y = pdfLabel(doc,y+2,'Diagnostic hypothesis',PDF_ACCENT); y = pdfBody(doc,y,pack.diagnosticFocus);
+  y = pdfLabel(doc,y+2,'Programme direction & rationale'); y = pdfBody(doc,y,pack.programDirection);
+
+  y = ensureSpace(doc,y,14);
+  y = pdfLabel(doc,y+3,'Skill-by-skill diagnostic matrix', PDF_BRONZE);
+  pack.matrix.forEach(row=>{
+    y = ensureSpace(doc,y,14);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...PDF_INK);
+    doc.text(row.label+' — '+row.sevInfo.text, MARGIN, y); y+=5;
+    y = pdfBody(doc, y, 'Task: '+row.task);
+    y = pdfBody(doc, y, 'Watch: '+row.watch.join(' · '));
+    if(row.observableCriteria) y = pdfBody(doc, y, 'Observable criteria: '+row.observableCriteria.join(' · '));
+    y += 1;
+  });
+
+  s.phases.forEach(phase=>{
+    y = ensureSpace(doc,y,20); y+=4;
+    doc.setDrawColor(...PDF_LINE); doc.line(MARGIN,y,PAGE_W-MARGIN,y); y+=6;
+    doc.setTextColor(...PDF_ACCENT); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text(`${phase.kicker} · ${phase.clock} · ${phase.minutes} MIN`, MARGIN, y); y+=6;
+    doc.setTextColor(...PDF_INK); doc.setFont('helvetica','bold'); doc.setFontSize(13.5);
+    const tlines = doc.splitTextToSize(phase.title, MAX_W); doc.text(tlines, MARGIN, y); y += tlines.length*6+2;
+    phase.sections.forEach(sec=>{
+      const col = sec.kindClass==='rules' ? PDF_BRONZE : PDF_MUTED;
+      y = pdfLabel(doc,y+2,sec.label,col);
+      if(sec.kind==='quotes') sec.items.forEach(q=>{ y=pdfBody(doc,y,'"'+q+'"',{italic:true,indent:3}); });
+      else if(sec.kind==='prose') sec.items.forEach(p=>{ y=pdfBody(doc,y,p); });
+      else y = pdfBullets(doc,y,sec.items);
+    });
+  });
+
+  y = ensureSpace(doc,y,34); y+=4;
+  doc.setFillColor(...PDF_INK); doc.roundedRect(MARGIN,y,MAX_W,32,2,2,'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text('OFFER', MARGIN+6, y+8);
+  doc.setFont('helvetica','italic'); doc.setFontSize(12.5); doc.text(pack.offer.name, MARGIN+6, y+15);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(doc.splitTextToSize(pack.offer.cadence, MAX_W-12), MARGIN+6, y+21);
+  doc.text(doc.splitTextToSize(pack.offer.close, MAX_W-12), MARGIN+6, y+26);
+
+  footer(doc, 'Trial script — confidential');
+  doc.save(`yasmine.b_Trial_${slug(pack.input.studentName)}.pdf`);
+}
+
+function downloadProgramPdf(kind){
+  if(!lastProgramPack) return;
+  const pack = lastProgramPack;
+  const doc = newDoc();
+  const title = `${pack.input.studentName} — ${GOAL_LABEL[pack.input.goal]}`;
+  let y = pdfMasthead(doc, kind==='tutor' ? 'Tutor programme · internal codes' : 'Your personalised programme', title,
+    pack.mode===MODE.SPRINT ? `${PROFESSION_LABEL[pack.input.profession]} · ${LEVEL_LABEL[pack.input.level]} · ${pack.weeks}-week emergency plan to the exam date`
+      : `${PROFESSION_LABEL[pack.input.profession]} · ${LEVEL_LABEL[pack.input.level]} · ${DEADLINE_LABEL[pack.input.timeline]}`);
+
+  doc.setFillColor(...PDF_ACCENT); const modeLbl = (kind==='student' ? (pack.mode===MODE.SPRINT ? 'FOCUSED PLAN' : pack.mode===MODE.SUSTAINABLE ? 'ONGOING PLAN' : 'YOUR PLAN') : MODE_META[pack.mode].label).toUpperCase();
+  doc.roundedRect(MARGIN, y-4, doc.getTextWidth(modeLbl)+8, 6.5, 1.5, 1.5, 'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.text(modeLbl, MARGIN+4, y);
+  y += 10;
+
+  if(kind==='student'){
+    y = pdfLabel(doc,y,'What this programme is built around');
+    y = pdfBody(doc, y, pack.studentSummary);
+    y = pdfLabel(doc,y+2,'What to expect each week');
+    y = pdfBody(doc, y, `We'll work on one clear focus each session, with a short homework task afterwards (about ${pack.scaffold.homeworkMinutes} minutes) so what we practise actually sticks.`);
+    y = pdfLabel(doc,y+2,'How you will know it is working');
+    y = pdfBody(doc, y, `Every ${pack.unitLabel.toLowerCase()} below ends with a short line called "What success looks like". Use it as your own quick check at the end of the ${pack.unitLabel.toLowerCase()}.`);
+  } else {
+    if(pack.cutNotice){
+      // Banner first: the reader must see this before anything else in a sprint tutor PDF
+      doc.setFont('helvetica','normal'); doc.setFontSize(9.5);          // measure with the SAME font we draw with
+      const noticeLines = doc.splitTextToSize(pack.cutNotice, MAX_W-12);
+      const boxH = 13 + noticeLines.length*4.4;
+      y = ensureSpace(doc,y,boxH+4);
+      doc.setFillColor(246,235,232); doc.setDrawColor(142,59,46);
+      doc.roundedRect(MARGIN, y-4, MAX_W, boxH, 1.5, 1.5, 'FD');
+      doc.setTextColor(142,59,46); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+      doc.text('EXTREME SPRINT – NON-ESSENTIAL CONTENT REMOVED', MARGIN+5, y+1);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...PDF_INK);
+      doc.text(noticeLines, MARGIN+5, y+7);
+      y += boxH + 3;
+    }
+    y = pdfLabel(doc,y,'Compression mode & rationale'); y = pdfBody(doc,y,pack.rationale);
+    y = pdfLabel(doc,y+2,'Rules applied to this student');
+    y = pdfBody(doc, y, `Tone: ${pack.scaffold.tone}`);
+    y = pdfBody(doc, y, `Correction style: ${pack.scaffold.correctionStyle}`);
+    y = pdfBody(doc, y, `New items/lesson: ${pack.scaffold.newItemsPerLesson}  ·  Homework: ${pack.scaffold.homeworkTasks} (~${pack.scaffold.homeworkMinutes} min/week)`);
+    y = pdfLabel(doc,y+2,'Level ceiling to respect'); y = pdfBody(doc, y, pack.levelProfile.ceiling);
+    y = pdfLabel(doc,y+2,'Profession role-play bank'); y = pdfBody(doc, y, pack.roleplay.bank);
+    y = pdfLabel(doc,y+2,'Success criteria'); y = pdfBody(doc, y, pack.roleplay.successCriteria);
+  }
+
+  y = pdfLabel(doc,y+4,'Week-by-week roadmap'); y+=2;
+  pack.weeksArr.forEach(w=>{
+    y = ensureSpace(doc,y, kind==='tutor'?22:26);
+    doc.setDrawColor(...PDF_LINE); doc.line(MARGIN,y,PAGE_W-MARGIN,y); y+=6;
+    doc.setTextColor(...PDF_ACCENT); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text(String(w.n).padStart(2,'0'), MARGIN, y);
+    doc.setTextColor(...PDF_INK); doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+    doc.text(w.title, MARGIN+14, y);
+    if(kind==='tutor'){
+      doc.setTextColor(...PDF_MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+      const dl = doc.splitTextToSize(`${w.track}  ·  grammar ${w.grammarCode} (${w.grammarTitle})  ·  pron ${w.pronCode} (${w.pronTitle})  ·  ${w.homeworkTasks} HW`, MAX_W-14);
+      doc.text(dl, MARGIN+14, y+5);
+      y += dl.length*3.8 + 1.2;
+      if(w.riskNote){
+        doc.setTextColor(...[142,59,46]); doc.setFont('helvetica','italic'); doc.setFontSize(8);
+        const rlines = doc.splitTextToSize('Risk: '+w.riskNote, MAX_W-14);
+        doc.text(rlines, MARGIN+14, y+4.5); y += rlines.length*4+2;
+      }
+    } else {
+      doc.setTextColor(...PDF_ACCENT); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      doc.text('WHAT SUCCESS LOOKS LIKE THIS '+pack.unitLabel.toUpperCase(), MARGIN+14, y+5);
+      doc.setTextColor(...PDF_INK); doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+      const slines = doc.splitTextToSize(w.studentSuccessLine, MAX_W-14);
+      doc.text(slines, MARGIN+14, y+10); y += slines.length*4.6+6;
+    }
+    y += 6;
+  });
+
+  footer(doc, kind==='tutor' ? 'Tutor programme — confidential' : 'Student programme');
+  doc.save(`yasmine.b_Programme_${kind}_${slug(pack.input.studentName)}.pdf`);
+}
+
+function downloadLessonPdf(){
+  const script = window._currentLessonScript;
+  if(!script) return;
+  const doc = newDoc();
+  let y = pdfMasthead(doc, 'Tutor lesson script · internal codes', `${script.input.studentName} — ${script.unitLabel} ${script.week.n}: ${script.week.title}`, `${script.duration} minutes`);
+  const blocks = [
+    ['01 · Warm-up & homework check', script.warmup.minutes, [script.warmup.content]],
+    [`02 · Grammar ${script.grammarBlock.code}`, script.grammarBlock.minutes, [script.grammarBlock.title, script.grammarBlock.explanation, 'Example: '+script.grammarBlock.example, 'Common mistake: '+script.grammarBlock.mistake, 'Teaching note: '+script.grammarBlock.teachingNote]],
+    [`03 · Pronunciation ${script.pronBlock.code}`, script.pronBlock.minutes, [script.pronBlock.title, script.pronBlock.explanation, 'Target words: '+script.pronBlock.words]],
+    ['04 · Patient case', script.caseWork.minutes, [script.caseWork.title, script.caseWork.case, ...(script.caseWork.hiddenConcern ? ['Hidden concern (tutor-only): '+script.caseWork.hiddenConcern] : []), 'Success criteria: '+script.caseWork.successCriteria, 'Scaffolding: '+script.caseWork.scaffoldingNote]],
+    ...(script.frames.length ? [['Support · Ready-made language frames', 0, ['Give these to the student before the case work. Fade out as confidence grows.'].concat(script.frames)]] : []),
+    ['05 · Exit check', script.exitCheck.minutes, script.exitCheck.items],
+    ['Homework', script.homework.minutes, [script.homework.description]]
+  ];
+  blocks.forEach(([label, minutes, items])=>{
+    y = ensureSpace(doc,y,16); y+=4;
+    doc.setDrawColor(...PDF_LINE); doc.line(MARGIN,y,PAGE_W-MARGIN,y); y+=6;
+    doc.setTextColor(...PDF_ACCENT); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text(`${label} · ${minutes} min`, MARGIN, y); y+=7;
+    items.forEach(t=>{ y = pdfBody(doc,y,t); });
+  });
+  footer(doc, 'Lesson script — confidential');
+  doc.save(`yasmine.b_Lesson_${slug(script.input.studentName)}_wk${script.week.n}.pdf`);
+}
+
+function downloadWorksheetPdf(){
+  const ws = window._currentWorksheet;
+  if(!ws) return;
+  const doc = newDoc();
+  let y = pdfMasthead(doc, 'Student worksheet', `${ws.input.studentName}'s worksheet — ${ws.unitLabel} ${ws.week.n}`, ws.title);
+  y = pdfLabel(doc,y,"This week's focus"); y = pdfBody(doc,y,ws.focus);
+  y = pdfLabel(doc,y+2,"What success looks like this week", PDF_ACCENT); y = pdfBody(doc,y,ws.successLine);
+  y = pdfLabel(doc,y+3,ws.languageBlock.heading); y = pdfBody(doc,y, ws.languageBlock.frame || ws.languageBlock.content);
+  y = pdfLabel(doc,y+3,ws.practiceBlock.heading); y = pdfBody(doc,y,ws.practiceBlock.content);
+  if(ws.frames.length){ y = pdfLabel(doc,y+3,'Sentence starters to help you'); y = pdfBullets(doc,y,ws.frames); }
+  y = pdfLabel(doc,y+3,ws.homeworkBlock.heading); y = pdfBody(doc,y,ws.homeworkBlock.content);
+  if(ws.scaffoldNote){ y = pdfBody(doc,y+2,ws.scaffoldNote,{italic:true}); }
+  footer(doc, 'Student worksheet');
+  doc.save(`yasmine.b_Worksheet_${slug(ws.input.studentName)}_wk${ws.week.n}.pdf`);
+}
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  const crumbMap = {home:'', 'trial-wizard':'Trial', 'trial-output':'Trial · Script', program:'Programme', lesson:'Lesson script', worksheet:'Worksheet'};
+  document.getElementById('crumb').textContent = crumbMap[view] || '';
+  window.scrollTo(0,0);
+  if(view==='trial-wizard'){ wiz = {step:0, input:{...empty, skills:[]}}; renderStep(); }
+}
+function loadProfile(key, dest){
+  const input = SAMPLE_TRIALS[key];
+  currentStudentKey = key;
+  currentWeekIdx = 0;
+  if(dest==='trial'){ renderTrialOutput(generateTrial(input)); go('trial-output'); }
+  else if(dest==='program'){ renderProgram(buildProgram(input)); go('program'); }
+  else if(dest==='lesson'){ renderLessonWeekPicker(input); renderLessonOutput(input, 0); go('lesson'); highlightPicker('lesson-pick-', key); }
+  else if(dest==='worksheet'){ renderWorksheetOutput(input, 0); go('worksheet'); highlightPicker('ws-pick-', key); }
+}
+function highlightPicker(prefix, key){
+  ['aglailton','razik','zita'].forEach(k=>{
+    const el = document.getElementById(prefix+k);
+    if(el) el.classList.toggle('sel', k===key);
+  });
+}
+
+renderStep();
+</script>
+</body>
+</html>
